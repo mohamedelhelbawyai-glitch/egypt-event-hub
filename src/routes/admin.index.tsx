@@ -51,7 +51,7 @@ function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-background">
-      <AdminSidebar adminName={admin.name} adminRole={admin.role} onLogout={handleLogout} />
+      <AdminSidebar adminName={admin.name ?? ""} adminRole={admin.role ?? ""} onLogout={handleLogout} />
       <main className="flex-1 overflow-y-auto">
         <div className="border-b border-border bg-card px-6 py-4">
           <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
