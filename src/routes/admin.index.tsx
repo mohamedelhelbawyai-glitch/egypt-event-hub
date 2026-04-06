@@ -31,7 +31,7 @@ function AdminDashboard() {
     return null;
   }
 
-  const admin = session.admin!;
+  const admin = session.admin ?? { name: "", email: "", role: "", adminId: "" };
 
   const handleLogout = async () => {
     await logoutFn();
