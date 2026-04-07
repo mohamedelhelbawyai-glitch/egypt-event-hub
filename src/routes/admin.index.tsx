@@ -1,7 +1,8 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { getAdminSession, adminLogout } from "@/lib/admin-auth.functions";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { useServerFn } from "@tanstack/react-start";
+import { redirect } from "@tanstack/react-router";
 import {
   Calendar,
   Users,
@@ -16,26 +17,21 @@ import {
 export const Route = createFileRoute("/admin/")({
   loader: async () => {
     const session = await getAdminSession();
-    return { session };
+    if (!session.authenticated) {
+      throw redirect({ to: "/admin/login" });
+    }
+    return { admin: session.admin! };
   },
   component: AdminDashboard,
 });
 
 function AdminDashboard() {
-  const { session } = Route.useLoaderData();
-  const navigate = useNavigate();
+  const { admin } = Route.useLoaderData();
   const logoutFn = useServerFn(adminLogout);
-
-  if (!session.authenticated) {
-    navigate({ to: "/admin/login" });
-    return null;
-  }
-
-  const admin = session.admin;
 
   const handleLogout = async () => {
     await logoutFn();
-    navigate({ to: "/admin/login" });
+    // Server-side redirect handles navigation
   };
 
   const stats = [
@@ -51,7 +47,7 @@ function AdminDashboard() {
 
   return (
     <div className="flex h-screen bg-background">
-      <AdminSidebar adminName={admin.email ?? ""} adminRole="Admin" onLogout={handleLogout} />
+      <AdminSidebar adminName={admin.email} adminRole="Admin" onLogout={handleLogout} />
       <main className="flex-1 overflow-y-auto">
         <div className="border-b border-border bg-card px-6 py-4">
           <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
