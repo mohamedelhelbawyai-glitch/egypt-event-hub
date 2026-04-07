@@ -1,38 +1,39 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { Ticket, Loader2 } from "lucide-react";
 import { adminLogin, getAdminSession } from "@/lib/admin-auth.functions";
+import { redirect } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 
 export const Route = createFileRoute("/admin/login")({
   loader: async () => {
     const session = await getAdminSession();
-    return { session };
+    if (session.authenticated) {
+      throw redirect({ to: "/admin" });
+    }
   },
   component: AdminLoginPage,
 });
 
 function AdminLoginPage() {
-  const { session } = Route.useLoaderData();
-  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  if (session.authenticated) {
-    navigate({ to: "/admin" });
-    return null;
-  }
+  const loginFn = useServerFn(adminLogin);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
     try {
-      await adminLogin({ data: { email, password } });
-      navigate({ to: "/admin" });
+      await loginFn({ data: { email, password } });
+      // Server-side redirect handles navigation
     } catch (err: any) {
-      setError(err.message || "Login failed");
+      // redirect throws are re-thrown by TanStack — only real errors land here
+      if (err?.message && !err?.isRedirect) {
+        setError(err.message || "Login failed");
+      }
     } finally {
       setLoading(false);
     }

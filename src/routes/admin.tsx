@@ -1,7 +1,6 @@
-import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
-import { getAdminSession, adminLogout } from "@/lib/admin-auth.functions";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import { useServerFn } from "@tanstack/react-start";
+import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { getAdminSession } from "@/lib/admin-auth.functions";
+import { redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
