@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createMiddleware } from "@tanstack/react-start";
 import { useSession } from "@tanstack/react-start/server";
+import { redirect } from "@tanstack/react-router";
 import { z } from "zod";
 
 const SESSION_CONFIG = {
@@ -20,11 +21,11 @@ export const requireAdminAuth = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
     const session = await useSession<AdminSession>(SESSION_CONFIG);
     if (!session.data?.accessToken) {
-      throw new Error("UNAUTHORIZED");
+      throw redirect({ to: "/admin/login" });
     }
     if (Date.now() > (session.data.expiresAt ?? 0)) {
       await session.clear();
-      throw new Error("UNAUTHORIZED");
+      throw redirect({ to: "/admin/login" });
     }
     return next({
       context: {
@@ -73,17 +74,15 @@ export const adminLogin = createServerFn({ method: "POST" })
       expiresAt: Date.now() + authResponse.expiresIn * 1000,
     });
 
-    return {
-      success: true,
-      admin: { email: data.email },
-    };
+    // Server-side redirect after setting the session cookie
+    throw redirect({ to: "/admin" });
   });
 
 export const adminLogout = createServerFn({ method: "POST" }).handler(
   async () => {
     const session = await useSession<AdminSession>(SESSION_CONFIG);
     await session.clear();
-    return { success: true };
+    throw redirect({ to: "/admin/login" });
   }
 );
 
