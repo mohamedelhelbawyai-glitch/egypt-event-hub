@@ -12,19 +12,28 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminVenuesRouteImport } from './routes/admin.venues'
+import { Route as AdminUsersRouteImport } from './routes/admin.users'
 import { Route as AdminTicketTemplatesRouteImport } from './routes/admin.ticket-templates'
 import { Route as AdminTagsRouteImport } from './routes/admin.tags'
 import { Route as AdminRefundPoliciesRouteImport } from './routes/admin.refund-policies'
+import { Route as AdminPromoCodesRouteImport } from './routes/admin.promo-codes'
+import { Route as AdminPayoutsRouteImport } from './routes/admin.payouts'
+import { Route as AdminPaymentsRouteImport } from './routes/admin.payments'
 import { Route as AdminPaymentMethodsRouteImport } from './routes/admin.payment-methods'
+import { Route as AdminOrganizersRouteImport } from './routes/admin.organizers'
+import { Route as AdminOrdersRouteImport } from './routes/admin.orders'
 import { Route as AdminLoyaltyRulesRouteImport } from './routes/admin.loyalty-rules'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AdminGovernoratesRouteImport } from './routes/admin.governorates'
 import { Route as AdminFeeRulesRouteImport } from './routes/admin.fee-rules'
 import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
 import { Route as AdminFacilitiesRouteImport } from './routes/admin.facilities'
+import { Route as AdminEventsRouteImport } from './routes/admin.events'
 import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAudienceRulesRouteImport } from './routes/admin.audience-rules'
+import { Route as AdminAdminUsersRouteImport } from './routes/admin.admin-users'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -39,6 +48,16 @@ const IndexRoute = IndexRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminVenuesRoute = AdminVenuesRouteImport.update({
+  id: '/venues',
+  path: '/venues',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminTicketTemplatesRoute = AdminTicketTemplatesRouteImport.update({
@@ -56,9 +75,34 @@ const AdminRefundPoliciesRoute = AdminRefundPoliciesRouteImport.update({
   path: '/refund-policies',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPromoCodesRoute = AdminPromoCodesRouteImport.update({
+  id: '/promo-codes',
+  path: '/promo-codes',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPayoutsRoute = AdminPayoutsRouteImport.update({
+  id: '/payouts',
+  path: '/payouts',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPaymentsRoute = AdminPaymentsRouteImport.update({
+  id: '/payments',
+  path: '/payments',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminPaymentMethodsRoute = AdminPaymentMethodsRouteImport.update({
   id: '/payment-methods',
   path: '/payment-methods',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrganizersRoute = AdminOrganizersRouteImport.update({
+  id: '/organizers',
+  path: '/organizers',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => AdminRoute,
 } as any)
 const AdminLoyaltyRulesRoute = AdminLoyaltyRulesRouteImport.update({
@@ -91,6 +135,11 @@ const AdminFacilitiesRoute = AdminFacilitiesRouteImport.update({
   path: '/facilities',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminEventsRoute = AdminEventsRouteImport.update({
+  id: '/events',
+  path: '/events',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
   id: '/categories',
   path: '/categories',
@@ -106,59 +155,91 @@ const AdminAudienceRulesRoute = AdminAudienceRulesRouteImport.update({
   path: '/audience-rules',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminAdminUsersRoute = AdminAdminUsersRouteImport.update({
+  id: '/admin-users',
+  path: '/admin-users',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/admin-users': typeof AdminAdminUsersRoute
   '/admin/audience-rules': typeof AdminAudienceRulesRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/facilities': typeof AdminFacilitiesRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/fee-rules': typeof AdminFeeRulesRoute
   '/admin/governorates': typeof AdminGovernoratesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/loyalty-rules': typeof AdminLoyaltyRulesRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/organizers': typeof AdminOrganizersRoute
   '/admin/payment-methods': typeof AdminPaymentMethodsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/payouts': typeof AdminPayoutsRoute
+  '/admin/promo-codes': typeof AdminPromoCodesRoute
   '/admin/refund-policies': typeof AdminRefundPoliciesRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/ticket-templates': typeof AdminTicketTemplatesRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/venues': typeof AdminVenuesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/admin-users': typeof AdminAdminUsersRoute
   '/admin/audience-rules': typeof AdminAudienceRulesRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/facilities': typeof AdminFacilitiesRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/fee-rules': typeof AdminFeeRulesRoute
   '/admin/governorates': typeof AdminGovernoratesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/loyalty-rules': typeof AdminLoyaltyRulesRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/organizers': typeof AdminOrganizersRoute
   '/admin/payment-methods': typeof AdminPaymentMethodsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/payouts': typeof AdminPayoutsRoute
+  '/admin/promo-codes': typeof AdminPromoCodesRoute
   '/admin/refund-policies': typeof AdminRefundPoliciesRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/ticket-templates': typeof AdminTicketTemplatesRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/venues': typeof AdminVenuesRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/admin-users': typeof AdminAdminUsersRoute
   '/admin/audience-rules': typeof AdminAudienceRulesRoute
   '/admin/banners': typeof AdminBannersRoute
   '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/events': typeof AdminEventsRoute
   '/admin/facilities': typeof AdminFacilitiesRoute
   '/admin/feature-flags': typeof AdminFeatureFlagsRoute
   '/admin/fee-rules': typeof AdminFeeRulesRoute
   '/admin/governorates': typeof AdminGovernoratesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/loyalty-rules': typeof AdminLoyaltyRulesRoute
+  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/organizers': typeof AdminOrganizersRoute
   '/admin/payment-methods': typeof AdminPaymentMethodsRoute
+  '/admin/payments': typeof AdminPaymentsRoute
+  '/admin/payouts': typeof AdminPayoutsRoute
+  '/admin/promo-codes': typeof AdminPromoCodesRoute
   '/admin/refund-policies': typeof AdminRefundPoliciesRoute
   '/admin/tags': typeof AdminTagsRoute
   '/admin/ticket-templates': typeof AdminTicketTemplatesRoute
+  '/admin/users': typeof AdminUsersRoute
+  '/admin/venues': typeof AdminVenuesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -166,54 +247,81 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/admin/admin-users'
     | '/admin/audience-rules'
     | '/admin/banners'
     | '/admin/categories'
+    | '/admin/events'
     | '/admin/facilities'
     | '/admin/feature-flags'
     | '/admin/fee-rules'
     | '/admin/governorates'
     | '/admin/login'
     | '/admin/loyalty-rules'
+    | '/admin/orders'
+    | '/admin/organizers'
     | '/admin/payment-methods'
+    | '/admin/payments'
+    | '/admin/payouts'
+    | '/admin/promo-codes'
     | '/admin/refund-policies'
     | '/admin/tags'
     | '/admin/ticket-templates'
+    | '/admin/users'
+    | '/admin/venues'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin/admin-users'
     | '/admin/audience-rules'
     | '/admin/banners'
     | '/admin/categories'
+    | '/admin/events'
     | '/admin/facilities'
     | '/admin/feature-flags'
     | '/admin/fee-rules'
     | '/admin/governorates'
     | '/admin/login'
     | '/admin/loyalty-rules'
+    | '/admin/orders'
+    | '/admin/organizers'
     | '/admin/payment-methods'
+    | '/admin/payments'
+    | '/admin/payouts'
+    | '/admin/promo-codes'
     | '/admin/refund-policies'
     | '/admin/tags'
     | '/admin/ticket-templates'
+    | '/admin/users'
+    | '/admin/venues'
     | '/admin'
   id:
     | '__root__'
     | '/'
     | '/admin'
+    | '/admin/admin-users'
     | '/admin/audience-rules'
     | '/admin/banners'
     | '/admin/categories'
+    | '/admin/events'
     | '/admin/facilities'
     | '/admin/feature-flags'
     | '/admin/fee-rules'
     | '/admin/governorates'
     | '/admin/login'
     | '/admin/loyalty-rules'
+    | '/admin/orders'
+    | '/admin/organizers'
     | '/admin/payment-methods'
+    | '/admin/payments'
+    | '/admin/payouts'
+    | '/admin/promo-codes'
     | '/admin/refund-policies'
     | '/admin/tags'
     | '/admin/ticket-templates'
+    | '/admin/users'
+    | '/admin/venues'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -245,6 +353,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/venues': {
+      id: '/admin/venues'
+      path: '/venues'
+      fullPath: '/admin/venues'
+      preLoaderRoute: typeof AdminVenuesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/users': {
+      id: '/admin/users'
+      path: '/users'
+      fullPath: '/admin/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/ticket-templates': {
       id: '/admin/ticket-templates'
       path: '/ticket-templates'
@@ -266,11 +388,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRefundPoliciesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/promo-codes': {
+      id: '/admin/promo-codes'
+      path: '/promo-codes'
+      fullPath: '/admin/promo-codes'
+      preLoaderRoute: typeof AdminPromoCodesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payouts': {
+      id: '/admin/payouts'
+      path: '/payouts'
+      fullPath: '/admin/payouts'
+      preLoaderRoute: typeof AdminPayoutsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payments': {
+      id: '/admin/payments'
+      path: '/payments'
+      fullPath: '/admin/payments'
+      preLoaderRoute: typeof AdminPaymentsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/payment-methods': {
       id: '/admin/payment-methods'
       path: '/payment-methods'
       fullPath: '/admin/payment-methods'
       preLoaderRoute: typeof AdminPaymentMethodsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/organizers': {
+      id: '/admin/organizers'
+      path: '/organizers'
+      fullPath: '/admin/organizers'
+      preLoaderRoute: typeof AdminOrganizersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/orders': {
+      id: '/admin/orders'
+      path: '/orders'
+      fullPath: '/admin/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
       parentRoute: typeof AdminRoute
     }
     '/admin/loyalty-rules': {
@@ -315,6 +472,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFacilitiesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/events': {
+      id: '/admin/events'
+      path: '/events'
+      fullPath: '/admin/events'
+      preLoaderRoute: typeof AdminEventsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/categories': {
       id: '/admin/categories'
       path: '/categories'
@@ -336,40 +500,65 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAudienceRulesRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/admin-users': {
+      id: '/admin/admin-users'
+      path: '/admin-users'
+      fullPath: '/admin/admin-users'
+      preLoaderRoute: typeof AdminAdminUsersRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAdminUsersRoute: typeof AdminAdminUsersRoute
   AdminAudienceRulesRoute: typeof AdminAudienceRulesRoute
   AdminBannersRoute: typeof AdminBannersRoute
   AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminEventsRoute: typeof AdminEventsRoute
   AdminFacilitiesRoute: typeof AdminFacilitiesRoute
   AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
   AdminFeeRulesRoute: typeof AdminFeeRulesRoute
   AdminGovernoratesRoute: typeof AdminGovernoratesRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminLoyaltyRulesRoute: typeof AdminLoyaltyRulesRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminOrganizersRoute: typeof AdminOrganizersRoute
   AdminPaymentMethodsRoute: typeof AdminPaymentMethodsRoute
+  AdminPaymentsRoute: typeof AdminPaymentsRoute
+  AdminPayoutsRoute: typeof AdminPayoutsRoute
+  AdminPromoCodesRoute: typeof AdminPromoCodesRoute
   AdminRefundPoliciesRoute: typeof AdminRefundPoliciesRoute
   AdminTagsRoute: typeof AdminTagsRoute
   AdminTicketTemplatesRoute: typeof AdminTicketTemplatesRoute
+  AdminUsersRoute: typeof AdminUsersRoute
+  AdminVenuesRoute: typeof AdminVenuesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAdminUsersRoute: AdminAdminUsersRoute,
   AdminAudienceRulesRoute: AdminAudienceRulesRoute,
   AdminBannersRoute: AdminBannersRoute,
   AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminEventsRoute: AdminEventsRoute,
   AdminFacilitiesRoute: AdminFacilitiesRoute,
   AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
   AdminFeeRulesRoute: AdminFeeRulesRoute,
   AdminGovernoratesRoute: AdminGovernoratesRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminLoyaltyRulesRoute: AdminLoyaltyRulesRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
+  AdminOrganizersRoute: AdminOrganizersRoute,
   AdminPaymentMethodsRoute: AdminPaymentMethodsRoute,
+  AdminPaymentsRoute: AdminPaymentsRoute,
+  AdminPayoutsRoute: AdminPayoutsRoute,
+  AdminPromoCodesRoute: AdminPromoCodesRoute,
   AdminRefundPoliciesRoute: AdminRefundPoliciesRoute,
   AdminTagsRoute: AdminTagsRoute,
   AdminTicketTemplatesRoute: AdminTicketTemplatesRoute,
+  AdminUsersRoute: AdminUsersRoute,
+  AdminVenuesRoute: AdminVenuesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
