@@ -1,35 +1,41 @@
 import { createServerFn } from "@tanstack/react-start";
 import { createMiddleware } from "@tanstack/react-start";
-import { useSession } from "@tanstack/react-start/server";
+import {
+  getCookie,
+  setCookie,
+  deleteCookie,
+} from "@tanstack/react-start/server";
 import { redirect } from "@tanstack/react-router";
 import { z } from "zod";
 
-const SESSION_CONFIG = {
-  password:
-    process.env.SESSION_SECRET || "tazkara-admin-session-secret-key-32chars!!",
-  name: "tazkara-admin-session",
+const COOKIE_TOKEN = "tazkara-admin-token";
+const COOKIE_EMAIL = "tazkara-admin-email";
+const COOKIE_EXPIRES = "tazkara-admin-exp";
+const COOKIE_OPTS = {
+  httpOnly: true,
+  secure: true,
+  path: "/",
   maxAge: 60 * 60 * 8, // 8 hours
-};
-
-interface AdminSession {
-  accessToken: string;
-  email: string;
-  expiresAt: number; // unix ms
-}
+} as const;
 
 export const requireAdminAuth = createMiddleware({ type: "function" }).server(
   async ({ next }) => {
-    const session = await useSession<AdminSession>(SESSION_CONFIG);
-    if (!session.data?.accessToken) {
+    const token = getCookie(COOKIE_TOKEN);
+    const email = getCookie(COOKIE_EMAIL);
+    const expiresAt = Number(getCookie(COOKIE_EXPIRES) || "0");
+
+    if (!token) {
       throw redirect({ to: "/admin/login" });
     }
-    if (Date.now() > (session.data.expiresAt ?? 0)) {
-      await session.clear();
+    if (Date.now() > expiresAt) {
+      deleteCookie(COOKIE_TOKEN);
+      deleteCookie(COOKIE_EMAIL);
+      deleteCookie(COOKIE_EXPIRES);
       throw redirect({ to: "/admin/login" });
     }
     return next({
       context: {
-        admin: session.data,
+        admin: { accessToken: token, email: email || "" },
       },
     });
   }
@@ -66,41 +72,44 @@ export const adminLogin = createServerFn({ method: "POST" })
       tokenType: string;
     };
 
-    // Store token in encrypted server session
-    const session = await useSession<AdminSession>(SESSION_CONFIG);
-    await session.update({
-      accessToken: authResponse.accessToken,
-      email: data.email,
-      expiresAt: Date.now() + authResponse.expiresIn * 1000,
-    });
+    const expiresAt = Date.now() + authResponse.expiresIn * 1000;
 
-    // Return success — client will navigate after cookie is set
+    setCookie(COOKIE_TOKEN, authResponse.accessToken, COOKIE_OPTS);
+    setCookie(COOKIE_EMAIL, data.email, COOKIE_OPTS);
+    setCookie(COOKIE_EXPIRES, String(expiresAt), COOKIE_OPTS);
+
     return { success: true as const };
   });
 
 export const adminLogout = createServerFn({ method: "POST" }).handler(
   async () => {
-    const session = await useSession<AdminSession>(SESSION_CONFIG);
-    await session.clear();
+    deleteCookie(COOKIE_TOKEN);
+    deleteCookie(COOKIE_EMAIL);
+    deleteCookie(COOKIE_EXPIRES);
     return { success: true as const };
   }
 );
 
 export const getAdminSession = createServerFn({ method: "GET" }).handler(
   async () => {
-    const session = await useSession<AdminSession>(SESSION_CONFIG);
-    if (!session.data?.accessToken) {
+    const token = getCookie(COOKIE_TOKEN);
+    const email = getCookie(COOKIE_EMAIL);
+    const expiresAt = Number(getCookie(COOKIE_EXPIRES) || "0");
+
+    if (!token) {
       return { authenticated: false as const, admin: null };
     }
-    if (Date.now() > (session.data.expiresAt ?? 0)) {
-      await session.clear();
+    if (Date.now() > expiresAt) {
+      deleteCookie(COOKIE_TOKEN);
+      deleteCookie(COOKIE_EMAIL);
+      deleteCookie(COOKIE_EXPIRES);
       return { authenticated: false as const, admin: null };
     }
     return {
       authenticated: true as const,
       admin: {
-        email: session.data.email,
-        accessToken: session.data.accessToken,
+        email: email || "",
+        accessToken: token,
       },
     };
   }
