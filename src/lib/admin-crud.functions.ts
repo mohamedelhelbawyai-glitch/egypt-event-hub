@@ -18,7 +18,7 @@ export const listRecords = createServerFn({ method: "GET" })
       .order(data.orderBy ?? "created_at", { ascending: data.ascending ?? false });
     const { data: rows, error } = await query;
     if (error) throw new Error(error.message);
-    return rows as Record<string, unknown>[];
+    return (rows ?? []) as unknown as Array<Record<string, any>>;
   });
 
 // ─── Create record ───────────────────────────────────────
@@ -30,13 +30,13 @@ export const createRecord = createServerFn({ method: "POST" })
     })
   )
   .handler(async ({ data }) => {
-    const { data: row, error } = await supabaseAdmin
-      .from(data.table as any)
-      .insert(data.record as any)
+    const { data: row, error } = await (supabaseAdmin
+      .from(data.table as any) as any)
+      .insert(data.record)
       .select()
       .single();
     if (error) throw new Error(error.message);
-    return row;
+    return row as Record<string, any>;
   });
 
 // ─── Update record ───────────────────────────────────────
@@ -49,14 +49,14 @@ export const updateRecord = createServerFn({ method: "POST" })
     })
   )
   .handler(async ({ data }) => {
-    const { data: row, error } = await supabaseAdmin
-      .from(data.table as any)
-      .update(data.updates as any)
+    const { data: row, error } = await (supabaseAdmin
+      .from(data.table as any) as any)
+      .update(data.updates)
       .eq("id", data.id)
       .select()
       .single();
     if (error) throw new Error(error.message);
-    return row;
+    return row as Record<string, any>;
   });
 
 // ─── Delete record ───────────────────────────────────────
@@ -68,8 +68,8 @@ export const deleteRecord = createServerFn({ method: "POST" })
     })
   )
   .handler(async ({ data }) => {
-    const { error } = await supabaseAdmin
-      .from(data.table as any)
+    const { error } = await (supabaseAdmin
+      .from(data.table as any) as any)
       .delete()
       .eq("id", data.id);
     if (error) throw new Error(error.message);
@@ -87,9 +87,9 @@ export const toggleField = createServerFn({ method: "POST" })
     })
   )
   .handler(async ({ data }) => {
-    const { error } = await supabaseAdmin
-      .from(data.table as any)
-      .update({ [data.field]: data.value } as any)
+    const { error } = await (supabaseAdmin
+      .from(data.table as any) as any)
+      .update({ [data.field]: data.value })
       .eq("id", data.id);
     if (error) throw new Error(error.message);
     return { success: true };
