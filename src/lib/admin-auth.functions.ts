@@ -74,15 +74,15 @@ export const adminLogin = createServerFn({ method: "POST" })
       expiresAt: Date.now() + authResponse.expiresIn * 1000,
     });
 
-    // Server-side redirect after setting the session cookie
-    throw redirect({ to: "/admin" });
+    // Return success — client will navigate after cookie is set
+    return { success: true as const };
   });
 
 export const adminLogout = createServerFn({ method: "POST" }).handler(
   async () => {
     const session = await useSession<AdminSession>(SESSION_CONFIG);
     await session.clear();
-    throw redirect({ to: "/admin/login" });
+    return { success: true as const };
   }
 );
 
