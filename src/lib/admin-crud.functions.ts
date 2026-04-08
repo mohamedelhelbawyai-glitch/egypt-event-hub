@@ -26,7 +26,7 @@ export const createRecord = createServerFn({ method: "POST" })
   .inputValidator(
     z.object({
       table: z.string().min(1).max(100),
-      record: z.record(z.unknown()),
+      record: z.record(z.string(), z.unknown()),
     })
   )
   .handler(async ({ data }) => {
@@ -45,7 +45,7 @@ export const updateRecord = createServerFn({ method: "POST" })
     z.object({
       table: z.string().min(1).max(100),
       id: z.string().uuid(),
-      updates: z.record(z.unknown()),
+      updates: z.record(z.string(), z.unknown()),
     })
   )
   .handler(async ({ data }) => {
