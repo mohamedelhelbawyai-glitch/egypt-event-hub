@@ -12,7 +12,19 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
+import { Route as AdminTicketTemplatesRouteImport } from './routes/admin.ticket-templates'
+import { Route as AdminTagsRouteImport } from './routes/admin.tags'
+import { Route as AdminRefundPoliciesRouteImport } from './routes/admin.refund-policies'
+import { Route as AdminPaymentMethodsRouteImport } from './routes/admin.payment-methods'
+import { Route as AdminLoyaltyRulesRouteImport } from './routes/admin.loyalty-rules'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as AdminGovernoratesRouteImport } from './routes/admin.governorates'
+import { Route as AdminFeeRulesRouteImport } from './routes/admin.fee-rules'
+import { Route as AdminFeatureFlagsRouteImport } from './routes/admin.feature-flags'
+import { Route as AdminFacilitiesRouteImport } from './routes/admin.facilities'
+import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
+import { Route as AdminBannersRouteImport } from './routes/admin.banners'
+import { Route as AdminAudienceRulesRouteImport } from './routes/admin.audience-rules'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -29,36 +41,180 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminTicketTemplatesRoute = AdminTicketTemplatesRouteImport.update({
+  id: '/ticket-templates',
+  path: '/ticket-templates',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminTagsRoute = AdminTagsRouteImport.update({
+  id: '/tags',
+  path: '/tags',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminRefundPoliciesRoute = AdminRefundPoliciesRouteImport.update({
+  id: '/refund-policies',
+  path: '/refund-policies',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminPaymentMethodsRoute = AdminPaymentMethodsRouteImport.update({
+  id: '/payment-methods',
+  path: '/payment-methods',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminLoyaltyRulesRoute = AdminLoyaltyRulesRouteImport.update({
+  id: '/loyalty-rules',
+  path: '/loyalty-rules',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminGovernoratesRoute = AdminGovernoratesRouteImport.update({
+  id: '/governorates',
+  path: '/governorates',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFeeRulesRoute = AdminFeeRulesRouteImport.update({
+  id: '/fee-rules',
+  path: '/fee-rules',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFeatureFlagsRoute = AdminFeatureFlagsRouteImport.update({
+  id: '/feature-flags',
+  path: '/feature-flags',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminFacilitiesRoute = AdminFacilitiesRouteImport.update({
+  id: '/facilities',
+  path: '/facilities',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminBannersRoute = AdminBannersRouteImport.update({
+  id: '/banners',
+  path: '/banners',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAudienceRulesRoute = AdminAudienceRulesRouteImport.update({
+  id: '/audience-rules',
+  path: '/audience-rules',
   getParentRoute: () => AdminRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/audience-rules': typeof AdminAudienceRulesRoute
+  '/admin/banners': typeof AdminBannersRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/facilities': typeof AdminFacilitiesRoute
+  '/admin/feature-flags': typeof AdminFeatureFlagsRoute
+  '/admin/fee-rules': typeof AdminFeeRulesRoute
+  '/admin/governorates': typeof AdminGovernoratesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/loyalty-rules': typeof AdminLoyaltyRulesRoute
+  '/admin/payment-methods': typeof AdminPaymentMethodsRoute
+  '/admin/refund-policies': typeof AdminRefundPoliciesRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/ticket-templates': typeof AdminTicketTemplatesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin/audience-rules': typeof AdminAudienceRulesRoute
+  '/admin/banners': typeof AdminBannersRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/facilities': typeof AdminFacilitiesRoute
+  '/admin/feature-flags': typeof AdminFeatureFlagsRoute
+  '/admin/fee-rules': typeof AdminFeeRulesRoute
+  '/admin/governorates': typeof AdminGovernoratesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/loyalty-rules': typeof AdminLoyaltyRulesRoute
+  '/admin/payment-methods': typeof AdminPaymentMethodsRoute
+  '/admin/refund-policies': typeof AdminRefundPoliciesRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/ticket-templates': typeof AdminTicketTemplatesRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRouteWithChildren
+  '/admin/audience-rules': typeof AdminAudienceRulesRoute
+  '/admin/banners': typeof AdminBannersRoute
+  '/admin/categories': typeof AdminCategoriesRoute
+  '/admin/facilities': typeof AdminFacilitiesRoute
+  '/admin/feature-flags': typeof AdminFeatureFlagsRoute
+  '/admin/fee-rules': typeof AdminFeeRulesRoute
+  '/admin/governorates': typeof AdminGovernoratesRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/loyalty-rules': typeof AdminLoyaltyRulesRoute
+  '/admin/payment-methods': typeof AdminPaymentMethodsRoute
+  '/admin/refund-policies': typeof AdminRefundPoliciesRoute
+  '/admin/tags': typeof AdminTagsRoute
+  '/admin/ticket-templates': typeof AdminTicketTemplatesRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/admin' | '/admin/login' | '/admin/'
+  fullPaths:
+    | '/'
+    | '/admin'
+    | '/admin/audience-rules'
+    | '/admin/banners'
+    | '/admin/categories'
+    | '/admin/facilities'
+    | '/admin/feature-flags'
+    | '/admin/fee-rules'
+    | '/admin/governorates'
+    | '/admin/login'
+    | '/admin/loyalty-rules'
+    | '/admin/payment-methods'
+    | '/admin/refund-policies'
+    | '/admin/tags'
+    | '/admin/ticket-templates'
+    | '/admin/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/admin/login' | '/admin'
-  id: '__root__' | '/' | '/admin' | '/admin/login' | '/admin/'
+  to:
+    | '/'
+    | '/admin/audience-rules'
+    | '/admin/banners'
+    | '/admin/categories'
+    | '/admin/facilities'
+    | '/admin/feature-flags'
+    | '/admin/fee-rules'
+    | '/admin/governorates'
+    | '/admin/login'
+    | '/admin/loyalty-rules'
+    | '/admin/payment-methods'
+    | '/admin/refund-policies'
+    | '/admin/tags'
+    | '/admin/ticket-templates'
+    | '/admin'
+  id:
+    | '__root__'
+    | '/'
+    | '/admin'
+    | '/admin/audience-rules'
+    | '/admin/banners'
+    | '/admin/categories'
+    | '/admin/facilities'
+    | '/admin/feature-flags'
+    | '/admin/fee-rules'
+    | '/admin/governorates'
+    | '/admin/login'
+    | '/admin/loyalty-rules'
+    | '/admin/payment-methods'
+    | '/admin/refund-policies'
+    | '/admin/tags'
+    | '/admin/ticket-templates'
+    | '/admin/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -89,6 +245,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/ticket-templates': {
+      id: '/admin/ticket-templates'
+      path: '/ticket-templates'
+      fullPath: '/admin/ticket-templates'
+      preLoaderRoute: typeof AdminTicketTemplatesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/tags': {
+      id: '/admin/tags'
+      path: '/tags'
+      fullPath: '/admin/tags'
+      preLoaderRoute: typeof AdminTagsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/refund-policies': {
+      id: '/admin/refund-policies'
+      path: '/refund-policies'
+      fullPath: '/admin/refund-policies'
+      preLoaderRoute: typeof AdminRefundPoliciesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/payment-methods': {
+      id: '/admin/payment-methods'
+      path: '/payment-methods'
+      fullPath: '/admin/payment-methods'
+      preLoaderRoute: typeof AdminPaymentMethodsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/loyalty-rules': {
+      id: '/admin/loyalty-rules'
+      path: '/loyalty-rules'
+      fullPath: '/admin/loyalty-rules'
+      preLoaderRoute: typeof AdminLoyaltyRulesRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
@@ -96,16 +287,89 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/governorates': {
+      id: '/admin/governorates'
+      path: '/governorates'
+      fullPath: '/admin/governorates'
+      preLoaderRoute: typeof AdminGovernoratesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/fee-rules': {
+      id: '/admin/fee-rules'
+      path: '/fee-rules'
+      fullPath: '/admin/fee-rules'
+      preLoaderRoute: typeof AdminFeeRulesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/feature-flags': {
+      id: '/admin/feature-flags'
+      path: '/feature-flags'
+      fullPath: '/admin/feature-flags'
+      preLoaderRoute: typeof AdminFeatureFlagsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/facilities': {
+      id: '/admin/facilities'
+      path: '/facilities'
+      fullPath: '/admin/facilities'
+      preLoaderRoute: typeof AdminFacilitiesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/categories': {
+      id: '/admin/categories'
+      path: '/categories'
+      fullPath: '/admin/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/banners': {
+      id: '/admin/banners'
+      path: '/banners'
+      fullPath: '/admin/banners'
+      preLoaderRoute: typeof AdminBannersRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/audience-rules': {
+      id: '/admin/audience-rules'
+      path: '/audience-rules'
+      fullPath: '/admin/audience-rules'
+      preLoaderRoute: typeof AdminAudienceRulesRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminAudienceRulesRoute: typeof AdminAudienceRulesRoute
+  AdminBannersRoute: typeof AdminBannersRoute
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
+  AdminFacilitiesRoute: typeof AdminFacilitiesRoute
+  AdminFeatureFlagsRoute: typeof AdminFeatureFlagsRoute
+  AdminFeeRulesRoute: typeof AdminFeeRulesRoute
+  AdminGovernoratesRoute: typeof AdminGovernoratesRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminLoyaltyRulesRoute: typeof AdminLoyaltyRulesRoute
+  AdminPaymentMethodsRoute: typeof AdminPaymentMethodsRoute
+  AdminRefundPoliciesRoute: typeof AdminRefundPoliciesRoute
+  AdminTagsRoute: typeof AdminTagsRoute
+  AdminTicketTemplatesRoute: typeof AdminTicketTemplatesRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminAudienceRulesRoute: AdminAudienceRulesRoute,
+  AdminBannersRoute: AdminBannersRoute,
+  AdminCategoriesRoute: AdminCategoriesRoute,
+  AdminFacilitiesRoute: AdminFacilitiesRoute,
+  AdminFeatureFlagsRoute: AdminFeatureFlagsRoute,
+  AdminFeeRulesRoute: AdminFeeRulesRoute,
+  AdminGovernoratesRoute: AdminGovernoratesRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminLoyaltyRulesRoute: AdminLoyaltyRulesRoute,
+  AdminPaymentMethodsRoute: AdminPaymentMethodsRoute,
+  AdminRefundPoliciesRoute: AdminRefundPoliciesRoute,
+  AdminTagsRoute: AdminTagsRoute,
+  AdminTicketTemplatesRoute: AdminTicketTemplatesRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
