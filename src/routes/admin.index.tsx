@@ -1,8 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { getAdminSession, adminLogout } from "@/lib/admin-auth.functions";
-import { AdminSidebar } from "@/components/admin/AdminSidebar";
-import { useServerFn } from "@tanstack/react-start";
-import { redirect } from "@tanstack/react-router";
 import {
   Calendar,
   Users,
@@ -15,25 +11,10 @@ import {
 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/")({
-  loader: async () => {
-    const session = await getAdminSession();
-    if (!session.authenticated) {
-      throw redirect({ to: "/admin/login" });
-    }
-    return { admin: session.admin! };
-  },
   component: AdminDashboard,
 });
 
 function AdminDashboard() {
-  const { admin } = Route.useLoaderData();
-  const logoutFn = useServerFn(adminLogout);
-
-  const handleLogout = async () => {
-    await logoutFn();
-    // Server-side redirect handles navigation
-  };
-
   const stats = [
     { label: "Total Events", value: "0", icon: <Calendar size={20} />, color: "text-primary" },
     { label: "Total Users", value: "0", icon: <Users size={20} />, color: "text-success" },
@@ -46,49 +27,42 @@ function AdminDashboard() {
   ];
 
   return (
-    <div className="flex h-screen bg-background">
-      <AdminSidebar adminName={admin.email ?? ""} adminRole="Admin" onLogout={handleLogout} />
-      <main className="flex-1 overflow-y-auto">
-        <div className="border-b border-border bg-card px-6 py-4">
-          <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            Welcome back, {admin.email}
-          </p>
-        </div>
-        <div className="p-6">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-xl border border-border bg-card p-5 shadow-sm"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="text-sm text-muted-foreground">{stat.label}</p>
-                  <div className={stat.color}>{stat.icon}</div>
-                </div>
-                <p className="mt-2 text-2xl font-bold text-foreground">
-                  {stat.value}
-                </p>
+    <>
+      <div className="border-b border-border bg-card px-6 py-4">
+        <h1 className="text-xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted-foreground">Overview of your platform</p>
+      </div>
+      <div className="p-6">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat) => (
+            <div
+              key={stat.label}
+              className="rounded-xl border border-border bg-card p-5 shadow-sm"
+            >
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">{stat.label}</p>
+                <div className={stat.color}>{stat.icon}</div>
               </div>
-            ))}
-          </div>
+              <p className="mt-2 text-2xl font-bold text-foreground">{stat.value}</p>
+            </div>
+          ))}
+        </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-foreground">Recent Events</h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                No events yet. Events will appear here once organizers create them.
-              </p>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <h2 className="text-lg font-semibold text-foreground">Pending Approvals</h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                No pending approvals. Organizer and event review requests will appear here.
-              </p>
-            </div>
+        <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-foreground">Recent Events</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              No events yet. Events will appear here once organizers create them.
+            </p>
+          </div>
+          <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+            <h2 className="text-lg font-semibold text-foreground">Pending Approvals</h2>
+            <p className="mt-2 text-sm text-muted-foreground">
+              No pending approvals. Organizer and event review requests will appear here.
+            </p>
           </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </>
   );
 }

@@ -1,57 +1,44 @@
 
-# Tazkara · تذكرة — Build Plan
+# Admin Panel Build Plan
 
-## Scope: Backend (Supabase DB + server functions) + Admin Panel (React)
-**Excluded**: Flutter mobile app
+## Current State
+- ✅ Database: 32 tables created
+- ✅ Admin auth: Login via Railway API, session cookies
+- ✅ Admin shell: Sidebar + dashboard layout
+- ⚠️ Railway API only has Auth, Users, Organizers endpoints — config CRUD will use Supabase directly via server functions
 
----
+## What We'll Build
 
-## Phase 1 — Foundation (Database + Auth + Core Config)
-1. **Enable Lovable Cloud** (Supabase)
-2. **Create all 32 tables** via migrations matching the ERD (enums, FKs, indexes)
-3. **Seed reference data** (27 governorates, categories, fee rules, feature flags, etc.)
-4. **Admin authentication** (email/password login for admin_users with role-based access)
-5. **Design system** — bilingual (AR/EN) admin panel shell with sidebar navigation
+### Step 1 — Shared Admin Layout & Infrastructure
+- Move sidebar + auth guard to the `/admin` layout route (so all child pages share it)
+- Create reusable CRUD components: DataTable, FormDialog, DeleteConfirm
+- Create server function helpers for Supabase CRUD operations
 
-## Phase 2 — Dynamic Config Admin Modules
-6. **Event Categories** CRUD
-7. **Governorates & Cities** CRUD
-8. **Tags** CRUD
-9. **Venue Facilities** CRUD
-10. **Payment Methods Config** CRUD
-11. **Commission Fee Rules** CRUD
-12. **Homepage Banners** CRUD
-13. **Refund Policy Templates** CRUD
-14. **Loyalty Rules** CRUD
-15. **Feature Flags** toggle management
-16. **Ticket Type Templates** CRUD
-17. **Audience Restrictions** CRUD
+### Step 2 — Dynamic Config Modules (Phase 2)
+Each gets a list page with create/edit/delete:
+1. **Event Categories** — name_ar/en, color, icon, sort_order, active toggle
+2. **Governorates & Cities** — governorates list + nested cities
+3. **Tags** — name_ar/en, featured toggle, active toggle
+4. **Venue Facilities** — name_ar/en, icon, active toggle
+5. **Payment Methods Config** — provider, labels, min amount, active toggle
+6. **Commission Fee Rules** — trust tier, commission %, service fee, current toggle
+7. **Homepage Banners** — image, link, sort order, schedule, active toggle
+8. **Refund Policy Templates** — type, name, deadline, percentage
+9. **Loyalty Rules** — earn/redeem rates, expiry, limits
+10. **Feature Flags** — key, value toggle, description
+11. **Ticket Type Templates** — name, default price, visual type
+12. **Audience Restrictions** — labels, field, validation rule
 
-## Phase 3 — Core Business Admin
-18. **Users management** (list, view, suspend/ban)
-19. **Admin Users management** (SUPER_ADMIN: create, toggle active, assign roles)
-20. **Organizers management** (review, approve/reject, trust tier, verified badge)
-21. **Venues management** (review, approve/reject, edit)
-22. **Events management** (review, approve/reject/publish, cancel)
-23. **Ticket Types** view per event
-
-## Phase 4 — Orders, Finance & Analytics
-24. **Orders management** (list, view details, refund)
-25. **Payment Transactions** view
-26. **Organizer Payouts** (trigger, track status)
-27. **Promo Codes** CRUD
-28. **Loyalty Transactions** view
-29. **Ticket Scan Logs** view
-30. **Dashboard analytics** (event counts, revenue, ticket sales charts)
-
----
-
-### Tech Decisions
-- **Database**: Lovable Cloud (Supabase PostgreSQL) with RLS
-- **Auth**: Supabase Auth for admin users + custom admin_users table with roles
-- **Server logic**: TanStack Start server functions (no Edge Functions)
-- **UI**: React + Shadcn + Tailwind, bilingual AR/EN with RTL support
-- **No external services yet**: Paymob, Seats.io, Upstash integrations deferred to later
+### Step 3 — Core Business Management (Phase 3)
+13. **Users** — list, view details, suspend/ban actions
+14. **Admin Users** — list, create, toggle active, assign roles
+15. **Organizers** — list, review, approve/reject, trust tier
+16. **Venues** — list, review, approve/reject
+17. **Events** — list, review, approve/publish/cancel
+18. **Orders** — list, view details, refund
 
 ### Approach
-We'll build phase by phase. Each phase is deployable and testable independently. I'll start with Phase 1 (database schema + admin shell) after your approval.
+- All CRUD operations via TanStack server functions using Supabase admin client
+- Reusable DataTable with search, pagination, and bilingual column display
+- Each module is a separate route under `/admin/...`
+- Build incrementally: infrastructure → config modules → business modules
