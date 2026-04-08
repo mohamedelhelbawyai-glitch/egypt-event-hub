@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
+import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-router";
 import { getAdminSession, adminLogout } from "@/lib/admin-auth.functions";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 import { useServerFn } from "@tanstack/react-start";
@@ -21,6 +21,7 @@ export const Route = createFileRoute("/admin")({
 function AdminLayout() {
   const { admin } = Route.useLoaderData();
   const logoutFn = useServerFn(adminLogout);
+  const navigate = useNavigate();
 
   // Login page renders without sidebar
   if (!admin) {
@@ -29,6 +30,7 @@ function AdminLayout() {
 
   const handleLogout = async () => {
     await logoutFn();
+    navigate({ to: "/admin/login" });
   };
 
   return (
