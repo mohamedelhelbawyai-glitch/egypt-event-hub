@@ -40,7 +40,7 @@ function AdminLayout() {
         adminRole="Admin"
         onLogout={handleLogout}
       />
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto scrollbar-thin">
         <Outlet />
       </main>
     </div>

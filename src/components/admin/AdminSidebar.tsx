@@ -102,22 +102,26 @@ export function AdminSidebar({ adminName, adminRole, onLogout }: AdminSidebarPro
 
   return (
     <aside className="flex h-screen w-64 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
-      <div className="flex items-center gap-3 px-5 py-5 border-b border-sidebar-border">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg admin-gradient">
-          <Ticket size={18} className="text-primary-foreground" />
+      {/* Brand */}
+      <div className="flex items-center gap-3 px-5 py-5">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl admin-gradient shadow-brand">
+          <Ticket size={20} className="text-primary-foreground" strokeWidth={2.25} />
         </div>
         <div>
-          <h1 className="text-sm font-bold tracking-tight text-sidebar-foreground">Tazkara</h1>
-          <p className="text-[10px] text-sidebar-foreground/50">Admin Panel</p>
+          <h1 className="text-base font-extrabold tracking-tight text-foreground">Tazkara</h1>
+          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            Admin Panel
+          </p>
         </div>
       </div>
 
-      <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
+      {/* Nav */}
+      <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 pb-4 space-y-3">
         {navGroups.map((group) => (
           <div key={group.label}>
             <button
               onClick={() => toggleGroup(group.label)}
-              className="flex w-full items-center justify-between px-2 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-sidebar-foreground/40 hover:text-sidebar-foreground/60"
+              className="flex w-full items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground/70 hover:text-muted-foreground transition-colors"
             >
               {group.label}
               <ChevronDown
@@ -126,41 +130,53 @@ export function AdminSidebar({ adminName, adminRole, onLogout }: AdminSidebarPro
               />
             </button>
             {!collapsed[group.label] && (
-              <div className="space-y-0.5 mb-2">
-                {group.items.map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={`flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors ${
-                      isActive(item.to)
-                        ? "bg-sidebar-accent text-sidebar-primary font-medium"
-                        : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
-                    }`}
-                  >
-                    {item.icon}
-                    {item.label}
-                  </Link>
-                ))}
+              <div className="mt-1 space-y-0.5">
+                {group.items.map((item) => {
+                  const active = isActive(item.to);
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+                        active
+                          ? "admin-gradient text-primary-foreground shadow-brand"
+                          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                      }`}
+                    >
+                      <span
+                        className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
+                          active
+                            ? "bg-white/15 text-primary-foreground"
+                            : "text-muted-foreground group-hover:text-sidebar-accent-foreground"
+                        }`}
+                      >
+                        {item.icon}
+                      </span>
+                      <span className="truncate">{item.label}</span>
+                    </Link>
+                  );
+                })}
               </div>
             )}
           </div>
         ))}
       </nav>
 
-      <div className="border-t border-sidebar-border p-3">
-        <div className="flex items-center gap-2.5 px-2 py-1.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-sidebar-accent text-xs font-semibold text-sidebar-primary">
+      {/* User card */}
+      <div className="mx-3 mb-3 rounded-2xl border border-sidebar-border bg-card p-3 shadow-soft">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl admin-gradient text-sm font-bold text-primary-foreground shadow-brand">
             {adminName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate text-sidebar-foreground">{adminName}</p>
-            <p className="text-[10px] text-sidebar-foreground/50 capitalize">
+            <p className="text-sm font-semibold truncate text-foreground">{adminName}</p>
+            <p className="text-[11px] text-muted-foreground capitalize truncate">
               {adminRole.replace("_", " ").toLowerCase()}
             </p>
           </div>
           <button
             onClick={onLogout}
-            className="rounded-md p-1.5 text-sidebar-foreground/50 hover:bg-sidebar-accent hover:text-destructive transition-colors"
+            className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
             title="Logout"
           >
             <LogOut size={16} />

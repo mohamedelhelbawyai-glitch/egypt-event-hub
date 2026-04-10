@@ -143,74 +143,92 @@ export function AdminCrudPage({
   return (
     <>
       {/* Header */}
-      <div className="border-b border-border bg-card px-6 py-4 flex items-center justify-between">
+      <div className="border-b border-border bg-card/70 backdrop-blur px-8 py-6 flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-foreground">{title}</h1>
-          <p className="text-sm text-muted-foreground">{subtitle}</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+            {subtitle}
+          </p>
+          <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-foreground">{title}</h1>
         </div>
         <button
           onClick={openCreate}
-          className="flex items-center gap-2 rounded-md admin-gradient px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-xl admin-gradient px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-brand transition-transform hover:-translate-y-0.5"
         >
-          <Plus size={16} />
+          <Plus size={16} strokeWidth={2.5} />
           Add New
         </button>
       </div>
 
       {/* Content */}
-      <div className="p-6">
+      <div className="p-8">
         {/* Search */}
-        <div className="mb-4 relative max-w-sm">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <div className="mb-5 relative max-w-sm">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
           <input
             type="text"
-            placeholder="Search..."
+            placeholder="Search records..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-md border border-input bg-background pl-9 pr-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            className="w-full rounded-xl border border-input bg-card pl-10 pr-3 py-2.5 text-sm shadow-soft placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
           />
         </div>
 
         {/* Table */}
-        <div className="rounded-xl border border-border bg-card shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="rounded-2xl border border-border bg-card shadow-card overflow-hidden">
+          <div className="overflow-x-auto scrollbar-thin">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-border bg-muted/50">
+                <tr className="border-b border-border bg-muted/40">
                   {columns.map((col) => (
-                    <th key={col.key} className="px-4 py-3 text-left font-medium text-muted-foreground">
+                    <th
+                      key={col.key}
+                      className="px-5 py-3.5 text-left text-[11px] font-bold uppercase tracking-wider text-muted-foreground"
+                    >
                       {col.label}
                     </th>
                   ))}
-                  <th className="px-4 py-3 text-right font-medium text-muted-foreground">Actions</th>
+                  <th className="px-5 py-3.5 text-right text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={columns.length + 1} className="px-4 py-8 text-center text-muted-foreground">
-                      No records found
+                    <td colSpan={columns.length + 1} className="px-5 py-16 text-center">
+                      <div className="flex flex-col items-center gap-2">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted">
+                          <Search size={18} className="text-muted-foreground" />
+                        </div>
+                        <p className="text-sm font-medium text-foreground">No records found</p>
+                        <p className="text-xs text-muted-foreground">
+                          Try adjusting your search or add a new record.
+                        </p>
+                      </div>
                     </td>
                   </tr>
                 )}
                 {filtered.map((row) => (
-                  <tr key={row.id} className="border-b border-border last:border-0 hover:bg-muted/30 transition-colors">
+                  <tr
+                    key={row.id}
+                    className="border-b border-border last:border-0 hover:bg-primary/[0.03] transition-colors"
+                  >
                     {columns.map((col) => (
-                      <td key={col.key} className="px-4 py-3 text-foreground">
+                      <td key={col.key} className="px-5 py-3.5 text-foreground">
                         {col.render ? col.render(row[col.key], row) : String(row[col.key] ?? "")}
                       </td>
                     ))}
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-5 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => openEdit(row)}
-                          className="rounded-md p-1.5 text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+                          className="rounded-lg p-2 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
                         >
                           <Pencil size={14} />
                         </button>
                         <button
                           onClick={() => setDeleteId(row.id)}
-                          className="rounded-md p-1.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                          className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
                         >
                           <Trash2 size={14} />
                         </button>
@@ -222,20 +240,29 @@ export function AdminCrudPage({
             </table>
           </div>
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">{filtered.length} record(s)</p>
+        <p className="mt-3 text-xs font-medium text-muted-foreground">
+          {filtered.length} record{filtered.length === 1 ? "" : "s"}
+        </p>
       </div>
 
       {/* Create/Edit Dialog */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-lg rounded-xl border border-border bg-card p-6 shadow-xl mx-4 max-h-[80vh] overflow-y-auto">
-            <h2 className="text-lg font-semibold text-foreground mb-4">
-              {editing ? "Edit Record" : "Create Record"}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl border border-border bg-card shadow-pop max-h-[85vh] overflow-hidden flex flex-col">
+            <div className="flex items-center justify-between border-b border-border px-6 py-4">
+              <div>
+                <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                  {editing ? "Update" : "New record"}
+                </p>
+                <h2 className="mt-0.5 text-lg font-extrabold text-foreground">
+                  {editing ? "Edit Record" : "Create Record"}
+                </h2>
+              </div>
+            </div>
+            <form id="admin-crud-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto scrollbar-thin px-6 py-5 space-y-4">
               {fields.map((field) => (
                 <div key={field.key}>
-                  <label className="mb-1.5 block text-sm font-medium text-foreground">
+                  <label className="mb-1.5 block text-sm font-semibold text-foreground">
                     {field.label}
                     {field.required && <span className="text-destructive ml-1">*</span>}
                   </label>
@@ -246,11 +273,11 @@ export function AdminCrudPage({
                         setFormData((prev) => ({ ...prev, [field.key]: !prev[field.key] }))
                       }
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                        formData[field.key] ? "bg-primary" : "bg-muted"
+                        formData[field.key] ? "admin-gradient" : "bg-muted"
                       }`}
                     >
                       <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow-sm transition-transform ${
                           formData[field.key] ? "translate-x-6" : "translate-x-1"
                         }`}
                       />
@@ -262,7 +289,7 @@ export function AdminCrudPage({
                         setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))
                       }
                       required={field.required}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm shadow-soft focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                     >
                       <option value="">Select...</option>
                       {field.options?.map((opt) => (
@@ -280,11 +307,31 @@ export function AdminCrudPage({
                       required={field.required}
                       placeholder={field.placeholder}
                       rows={3}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm shadow-soft placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                     />
+                  ) : field.type === "color" ? (
+                    <div className="flex items-center gap-3">
+                      <input
+                        type="color"
+                        value={formData[field.key] || "#7C3AED"}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))
+                        }
+                        className="h-11 w-14 cursor-pointer rounded-xl border border-input bg-card p-1 shadow-soft"
+                      />
+                      <input
+                        type="text"
+                        value={formData[field.key] ?? ""}
+                        onChange={(e) =>
+                          setFormData((prev) => ({ ...prev, [field.key]: e.target.value }))
+                        }
+                        placeholder="#7C3AED"
+                        className="flex-1 rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm font-mono shadow-soft focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                      />
+                    </div>
                   ) : (
                     <input
-                      type={field.type === "number" ? "number" : field.type === "color" ? "color" : "text"}
+                      type={field.type === "number" ? "number" : "text"}
                       value={formData[field.key] ?? ""}
                       onChange={(e) =>
                         setFormData((prev) => ({
@@ -297,53 +344,56 @@ export function AdminCrudPage({
                       }
                       required={field.required}
                       placeholder={field.placeholder}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                      className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm shadow-soft placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
                     />
                   )}
                 </div>
               ))}
-
-              <div className="flex justify-end gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="flex items-center gap-2 rounded-md admin-gradient px-4 py-2 text-sm font-medium text-primary-foreground shadow-sm hover:opacity-90 disabled:opacity-50"
-                >
-                  {loading && <Loader2 size={14} className="animate-spin" />}
-                  {editing ? "Save" : "Create"}
-                </button>
-              </div>
             </form>
+            <div className="flex justify-end gap-2 border-t border-border px-6 py-4 bg-muted/30">
+              <button
+                type="button"
+                onClick={() => setShowForm(false)}
+                className="rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-accent transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                form="admin-crud-form"
+                disabled={loading}
+                className="inline-flex items-center gap-2 rounded-xl admin-gradient px-5 py-2.5 text-sm font-semibold text-primary-foreground shadow-brand transition-transform hover:-translate-y-0.5 disabled:opacity-50 disabled:hover:translate-y-0"
+              >
+                {loading && <Loader2 size={14} className="animate-spin" />}
+                {editing ? "Save Changes" : "Create"}
+              </button>
+            </div>
           </div>
         </div>
       )}
 
       {/* Delete Confirm */}
       {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-xl mx-4">
-            <h2 className="text-lg font-semibold text-foreground">Delete Record</h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Are you sure? This action cannot be undone.
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-border bg-card p-6 shadow-pop">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
+              <Trash2 size={20} />
+            </div>
+            <h2 className="mt-4 text-lg font-extrabold text-foreground">Delete record?</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              This action cannot be undone. The record will be permanently removed.
             </p>
-            <div className="flex justify-end gap-2 mt-6">
+            <div className="mt-6 flex justify-end gap-2">
               <button
                 onClick={() => setDeleteId(null)}
-                className="rounded-md border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-accent transition-colors"
+                className="rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-accent transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={loading}
-                className="flex items-center gap-2 rounded-md bg-destructive px-4 py-2 text-sm font-medium text-destructive-foreground shadow-sm hover:opacity-90 disabled:opacity-50"
+                className="inline-flex items-center gap-2 rounded-xl bg-destructive px-4 py-2.5 text-sm font-semibold text-destructive-foreground shadow-soft hover:bg-destructive/90 disabled:opacity-50"
               >
                 {loading && <Loader2 size={14} className="animate-spin" />}
                 Delete
@@ -361,12 +411,15 @@ export function AdminCrudPage({
 export function StatusBadge({ active }: { active: boolean }) {
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
         active
-          ? "bg-success/10 text-success"
-          : "bg-muted text-muted-foreground"
+          ? "bg-success/10 text-success ring-1 ring-inset ring-success/20"
+          : "bg-muted text-muted-foreground ring-1 ring-inset ring-border"
       }`}
     >
+      <span
+        className={`h-1.5 w-1.5 rounded-full ${active ? "bg-success" : "bg-muted-foreground/60"}`}
+      />
       {active ? "Active" : "Inactive"}
     </span>
   );
@@ -377,10 +430,10 @@ export function ColorSwatch({ hex }: { hex: string | null }) {
   return (
     <div className="flex items-center gap-2">
       <div
-        className="h-5 w-5 rounded-md border border-border"
+        className="h-6 w-6 rounded-lg border border-border shadow-soft"
         style={{ backgroundColor: hex }}
       />
-      <span className="text-xs text-muted-foreground">{hex}</span>
+      <span className="text-xs font-mono text-muted-foreground">{hex}</span>
     </div>
   );
 }
