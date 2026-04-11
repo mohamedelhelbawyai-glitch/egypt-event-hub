@@ -38,6 +38,10 @@ export const Route = createRootRoute({
       { property: "og:description", content: "Egypt's premier event ticketing platform — admin panel" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Tazkara · تذكرة — Admin Panel" },
+      { name: "twitter:description", content: "Egypt's premier event ticketing platform — admin panel" },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3ad6d023-6374-4367-b7a2-973d0ac511a4/id-preview-0463b3f6--41e5e301-7bbc-4f5d-b71c-e8b2e9f6fca0.lovable.app-1775862776257.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/3ad6d023-6374-4367-b7a2-973d0ac511a4/id-preview-0463b3f6--41e5e301-7bbc-4f5d-b71c-e8b2e9f6fca0.lovable.app-1775862776257.png" },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
