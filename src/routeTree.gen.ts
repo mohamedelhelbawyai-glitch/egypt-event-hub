@@ -34,6 +34,9 @@ import { Route as AdminCategoriesRouteImport } from './routes/admin.categories'
 import { Route as AdminBannersRouteImport } from './routes/admin.banners'
 import { Route as AdminAudienceRulesRouteImport } from './routes/admin.audience-rules'
 import { Route as AdminAdminUsersRouteImport } from './routes/admin.admin-users'
+import { Route as AdminVenuesNewRouteImport } from './routes/admin.venues.new'
+import { Route as AdminVenuesIdRouteImport } from './routes/admin.venues.$id'
+import { Route as AdminOrdersIdRouteImport } from './routes/admin.orders.$id'
 
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
@@ -160,6 +163,21 @@ const AdminAdminUsersRoute = AdminAdminUsersRouteImport.update({
   path: '/admin-users',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminVenuesNewRoute = AdminVenuesNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => AdminVenuesRoute,
+} as any)
+const AdminVenuesIdRoute = AdminVenuesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminVenuesRoute,
+} as any)
+const AdminOrdersIdRoute = AdminOrdersIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AdminOrdersRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -175,7 +193,7 @@ export interface FileRoutesByFullPath {
   '/admin/governorates': typeof AdminGovernoratesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/loyalty-rules': typeof AdminLoyaltyRulesRoute
-  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/organizers': typeof AdminOrganizersRoute
   '/admin/payment-methods': typeof AdminPaymentMethodsRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -185,8 +203,11 @@ export interface FileRoutesByFullPath {
   '/admin/tags': typeof AdminTagsRoute
   '/admin/ticket-templates': typeof AdminTicketTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
-  '/admin/venues': typeof AdminVenuesRoute
+  '/admin/venues': typeof AdminVenuesRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+  '/admin/orders/$id': typeof AdminOrdersIdRoute
+  '/admin/venues/$id': typeof AdminVenuesIdRoute
+  '/admin/venues/new': typeof AdminVenuesNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -201,7 +222,7 @@ export interface FileRoutesByTo {
   '/admin/governorates': typeof AdminGovernoratesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/loyalty-rules': typeof AdminLoyaltyRulesRoute
-  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/organizers': typeof AdminOrganizersRoute
   '/admin/payment-methods': typeof AdminPaymentMethodsRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -211,8 +232,11 @@ export interface FileRoutesByTo {
   '/admin/tags': typeof AdminTagsRoute
   '/admin/ticket-templates': typeof AdminTicketTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
-  '/admin/venues': typeof AdminVenuesRoute
+  '/admin/venues': typeof AdminVenuesRouteWithChildren
   '/admin': typeof AdminIndexRoute
+  '/admin/orders/$id': typeof AdminOrdersIdRoute
+  '/admin/venues/$id': typeof AdminVenuesIdRoute
+  '/admin/venues/new': typeof AdminVenuesNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -229,7 +253,7 @@ export interface FileRoutesById {
   '/admin/governorates': typeof AdminGovernoratesRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/loyalty-rules': typeof AdminLoyaltyRulesRoute
-  '/admin/orders': typeof AdminOrdersRoute
+  '/admin/orders': typeof AdminOrdersRouteWithChildren
   '/admin/organizers': typeof AdminOrganizersRoute
   '/admin/payment-methods': typeof AdminPaymentMethodsRoute
   '/admin/payments': typeof AdminPaymentsRoute
@@ -239,8 +263,11 @@ export interface FileRoutesById {
   '/admin/tags': typeof AdminTagsRoute
   '/admin/ticket-templates': typeof AdminTicketTemplatesRoute
   '/admin/users': typeof AdminUsersRoute
-  '/admin/venues': typeof AdminVenuesRoute
+  '/admin/venues': typeof AdminVenuesRouteWithChildren
   '/admin/': typeof AdminIndexRoute
+  '/admin/orders/$id': typeof AdminOrdersIdRoute
+  '/admin/venues/$id': typeof AdminVenuesIdRoute
+  '/admin/venues/new': typeof AdminVenuesNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -270,6 +297,9 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/venues'
     | '/admin/'
+    | '/admin/orders/$id'
+    | '/admin/venues/$id'
+    | '/admin/venues/new'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -296,6 +326,9 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/venues'
     | '/admin'
+    | '/admin/orders/$id'
+    | '/admin/venues/$id'
+    | '/admin/venues/new'
   id:
     | '__root__'
     | '/'
@@ -323,6 +356,9 @@ export interface FileRouteTypes {
     | '/admin/users'
     | '/admin/venues'
     | '/admin/'
+    | '/admin/orders/$id'
+    | '/admin/venues/$id'
+    | '/admin/venues/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -507,8 +543,55 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminUsersRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/venues/new': {
+      id: '/admin/venues/new'
+      path: '/new'
+      fullPath: '/admin/venues/new'
+      preLoaderRoute: typeof AdminVenuesNewRouteImport
+      parentRoute: typeof AdminVenuesRoute
+    }
+    '/admin/venues/$id': {
+      id: '/admin/venues/$id'
+      path: '/$id'
+      fullPath: '/admin/venues/$id'
+      preLoaderRoute: typeof AdminVenuesIdRouteImport
+      parentRoute: typeof AdminVenuesRoute
+    }
+    '/admin/orders/$id': {
+      id: '/admin/orders/$id'
+      path: '/$id'
+      fullPath: '/admin/orders/$id'
+      preLoaderRoute: typeof AdminOrdersIdRouteImport
+      parentRoute: typeof AdminOrdersRoute
+    }
   }
 }
+
+interface AdminOrdersRouteChildren {
+  AdminOrdersIdRoute: typeof AdminOrdersIdRoute
+}
+
+const AdminOrdersRouteChildren: AdminOrdersRouteChildren = {
+  AdminOrdersIdRoute: AdminOrdersIdRoute,
+}
+
+const AdminOrdersRouteWithChildren = AdminOrdersRoute._addFileChildren(
+  AdminOrdersRouteChildren,
+)
+
+interface AdminVenuesRouteChildren {
+  AdminVenuesIdRoute: typeof AdminVenuesIdRoute
+  AdminVenuesNewRoute: typeof AdminVenuesNewRoute
+}
+
+const AdminVenuesRouteChildren: AdminVenuesRouteChildren = {
+  AdminVenuesIdRoute: AdminVenuesIdRoute,
+  AdminVenuesNewRoute: AdminVenuesNewRoute,
+}
+
+const AdminVenuesRouteWithChildren = AdminVenuesRoute._addFileChildren(
+  AdminVenuesRouteChildren,
+)
 
 interface AdminRouteChildren {
   AdminAdminUsersRoute: typeof AdminAdminUsersRoute
@@ -522,7 +605,7 @@ interface AdminRouteChildren {
   AdminGovernoratesRoute: typeof AdminGovernoratesRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminLoyaltyRulesRoute: typeof AdminLoyaltyRulesRoute
-  AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminOrdersRoute: typeof AdminOrdersRouteWithChildren
   AdminOrganizersRoute: typeof AdminOrganizersRoute
   AdminPaymentMethodsRoute: typeof AdminPaymentMethodsRoute
   AdminPaymentsRoute: typeof AdminPaymentsRoute
@@ -532,7 +615,7 @@ interface AdminRouteChildren {
   AdminTagsRoute: typeof AdminTagsRoute
   AdminTicketTemplatesRoute: typeof AdminTicketTemplatesRoute
   AdminUsersRoute: typeof AdminUsersRoute
-  AdminVenuesRoute: typeof AdminVenuesRoute
+  AdminVenuesRoute: typeof AdminVenuesRouteWithChildren
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -548,7 +631,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminGovernoratesRoute: AdminGovernoratesRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminLoyaltyRulesRoute: AdminLoyaltyRulesRoute,
-  AdminOrdersRoute: AdminOrdersRoute,
+  AdminOrdersRoute: AdminOrdersRouteWithChildren,
   AdminOrganizersRoute: AdminOrganizersRoute,
   AdminPaymentMethodsRoute: AdminPaymentMethodsRoute,
   AdminPaymentsRoute: AdminPaymentsRoute,
@@ -558,7 +641,7 @@ const AdminRouteChildren: AdminRouteChildren = {
   AdminTagsRoute: AdminTagsRoute,
   AdminTicketTemplatesRoute: AdminTicketTemplatesRoute,
   AdminUsersRoute: AdminUsersRoute,
-  AdminVenuesRoute: AdminVenuesRoute,
+  AdminVenuesRoute: AdminVenuesRouteWithChildren,
   AdminIndexRoute: AdminIndexRoute,
 }
 
