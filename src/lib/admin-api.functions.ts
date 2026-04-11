@@ -131,7 +131,7 @@ export const listVenuesAdmin = createServerFn({ method: "GET" })
       total: payload.total ?? 0,
       page: payload.page ?? data.page ?? 1,
       limit: payload.limit ?? data.limit ?? 20,
-    };
+    } as any;
   });
 
 export const listVenueFacilitiesAdmin = createServerFn({ method: "GET" })
@@ -148,7 +148,7 @@ export const getVenueAdmin = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const result = await venuesApi.getPublicVenue(data.id);
-    return unwrapData<Venue>(result);
+    return unwrapData<Venue>(result) as any;
   });
 
 export const canWriteVenuesAdmin = createServerFn({ method: "GET" })
@@ -161,8 +161,8 @@ export const createVenueAdmin = createServerFn({ method: "POST" })
   .inputValidator(z.record(z.string(), z.unknown()))
   .handler(async ({ data }) => {
     const token = requireAdminToken();
-    const result = await venuesApi.createVenue(data as CreateVenueRequest, token);
-    return unwrapData<Venue>(result);
+    const result = await venuesApi.createVenue(data as unknown as CreateVenueRequest, token);
+    return unwrapData<Venue>(result) as any;
   });
 
 export const updateVenueAdmin = createServerFn({ method: "POST" })
@@ -175,7 +175,7 @@ export const updateVenueAdmin = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const token = requireAdminToken();
     const result = await venuesApi.updateMyVenue(data.id, data.updates as UpdateVenueRequest, token);
-    return unwrapData<Venue>(result);
+    return unwrapData<Venue>(result) as any;
   });
 
 export const deleteVenueAdmin = createServerFn({ method: "POST" })
@@ -199,7 +199,7 @@ export const approveVenueAdmin = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const token = requireAdminToken();
     const result = await venuesApi.approveAdmin(data.id, token);
-    return unwrapData<Venue>(result);
+    return unwrapData<Venue>(result) as any;
   });
 
 export const rejectVenueAdmin = createServerFn({ method: "POST" })
@@ -450,7 +450,7 @@ export const listOrdersAdmin = createServerFn({ method: "GET" })
       endDate: z.string().optional(),
     })
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<any> => {
     const token = requireAdminToken();
 
     const page = data.page ?? 1;
@@ -475,9 +475,6 @@ export const listOrdersAdmin = createServerFn({ method: "GET" })
         backendGap: false,
       };
     } catch (error) {
-      // Live backend currently does not expose admin order routes.
-      // Return an empty dataset with an explicit backend gap flag instead of
-      // falling back to user-scoped routes that reject admin tokens.
       if (error instanceof ApiError && error.status === 404) {
         return {
           rows: [],
@@ -497,7 +494,7 @@ export const getOrderAdmin = createServerFn({ method: "GET" })
       id: z.string(),
     })
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<any> => {
     const token = requireAdminToken();
 
     try {
@@ -531,7 +528,7 @@ export const refundOrderAdmin = createServerFn({ method: "POST" })
       id: z.string(),
     })
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<any> => {
     const token = requireAdminToken();
     const result = await ordersApi.refundAdmin(data.id, token);
     return unwrapData<Record<string, unknown>>(result);

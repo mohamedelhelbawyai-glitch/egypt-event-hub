@@ -171,7 +171,7 @@ function VenueDetailsPage() {
         sections: parseSections(form.sectionsText),
         facilityIds: form.facilityIds,
       };
-      await updateFn({ data: { id: venue.id, updates: payload } });
+      await updateFn({ data: { id: venue.id, updates: payload as Record<string, unknown> } });
       await refreshVenue();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update venue.");
