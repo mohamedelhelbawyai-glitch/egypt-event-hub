@@ -171,6 +171,15 @@ export default defineConfig(({ command, mode }) => {
     envDefine[`import.meta.env.${key}`] = JSON.stringify(value);
   }
 
+  // Load ALL env vars (including non-VITE_ prefixed) into process.env for SSR
+  // This ensures server functions can access SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, etc.
+  const allEnv = loadEnv(mode, process.cwd(), "");
+  for (const [key, value] of Object.entries(allEnv)) {
+    if (process.env[key] === undefined) {
+      process.env[key] = value;
+    }
+  }
+
   return {
     server: {
       host: "::",
