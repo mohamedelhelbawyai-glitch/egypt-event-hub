@@ -1,123 +1,176 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   Calendar,
   Users,
-  ShoppingCart,
-  TrendingUp,
   Building2,
-  MapPin,
-  Ticket,
-  CreditCard,
+  Clock,
   ArrowUpRight,
+  TrendingUp,
 } from "lucide-react";
+import { adminApi } from "@/lib/api-client";
+import { getAdminSession } from "@/lib/admin-auth.functions";
 
 export const Route = createFileRoute("/admin/")({
+  loader: async () => {
+    const session = await getAdminSession();
+    if (!session.authenticated || !session.admin) {
+      return { stats: null };
+    }
+    try {
+      const stats = await adminApi.getDashboardStats(session.admin.accessToken);
+      return { stats };
+    } catch {
+      return { stats: null };
+    }
+  },
   component: AdminDashboard,
 });
 
-type Stat = {
-  label: string;
-  value: string;
-  icon: React.ReactNode;
-  tone: "violet" | "blue" | "green" | "amber" | "pink" | "red";
-  delta?: string;
-};
+type Tone = "violet" | "blue" | "green" | "amber";
 
-const toneClasses: Record<Stat["tone"], string> = {
+const toneClasses: Record<Tone, string> = {
   violet: "bg-primary/10 text-primary",
   blue: "bg-info/10 text-info",
   green: "bg-success/10 text-success",
   amber: "bg-warning/15 text-warning",
-  pink: "bg-chart-5/15 text-chart-5",
-  red: "bg-destructive/10 text-destructive",
 };
 
+function StatCard({
+  label,
+  value,
+  icon,
+  tone,
+  sub,
+}: {
+  label: string;
+  value: number | string;
+  icon: React.ReactNode;
+  tone: Tone;
+  sub?: string;
+}) {
+  return (
+    <div className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-pop">
+      <div className="flex items-start justify-between">
+        <div className={`flex h-11 w-11 items-center justify-center rounded-xl ${toneClasses[tone]}`}>
+          {icon}
+        </div>
+        {sub && (
+          <span className="inline-flex items-center gap-0.5 rounded-full bg-warning/10 px-2 py-0.5 text-[11px] font-semibold text-warning">
+            <Clock size={10} />
+            {sub} pending
+          </span>
+        )}
+      </div>
+      <p className="mt-4 text-sm font-medium text-muted-foreground">{label}</p>
+      <p className="mt-1 text-3xl font-extrabold tracking-tight text-foreground">
+        {value ?? "—"}
+      </p>
+    </div>
+  );
+}
+
 function AdminDashboard() {
-  const stats: Stat[] = [
-    { label: "Total Events", value: "0", icon: <Calendar size={20} />, tone: "violet", delta: "+0%" },
-    { label: "Total Users", value: "0", icon: <Users size={20} />, tone: "green", delta: "+0%" },
-    { label: "Total Orders", value: "0", icon: <ShoppingCart size={20} />, tone: "amber", delta: "+0%" },
-    { label: "Revenue (EGP)", value: "0", icon: <TrendingUp size={20} />, tone: "blue", delta: "+0%" },
-    { label: "Organizers", value: "0", icon: <Building2 size={20} />, tone: "pink" },
-    { label: "Venues", value: "0", icon: <MapPin size={20} />, tone: "violet" },
-    { label: "Tickets Sold", value: "0", icon: <Ticket size={20} />, tone: "green" },
-    { label: "Pending Payouts", value: "0", icon: <CreditCard size={20} />, tone: "red" },
-  ];
+  const { stats } = Route.useLoaderData();
 
   return (
     <>
       {/* Header */}
       <div className="border-b border-border bg-card/70 backdrop-blur px-8 py-6">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Overview
-        </p>
-        <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-foreground">
-          Dashboard
-        </h1>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Overview</p>
+        <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-foreground">Dashboard</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          A quick look at platform activity and key metrics.
+          Live platform activity from the backend.
         </p>
       </div>
 
       <div className="p-8 space-y-8">
-        {/* Stat grid */}
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-card transition-all hover:-translate-y-0.5 hover:shadow-pop"
-            >
-              <div className="flex items-start justify-between">
-                <div
-                  className={`flex h-11 w-11 items-center justify-center rounded-xl ${toneClasses[stat.tone]}`}
-                >
-                  {stat.icon}
-                </div>
-                {stat.delta && (
-                  <span className="inline-flex items-center gap-0.5 rounded-full bg-success/10 px-2 py-0.5 text-[11px] font-semibold text-success">
-                    <ArrowUpRight size={11} />
-                    {stat.delta}
-                  </span>
-                )}
-              </div>
-              <p className="mt-4 text-sm font-medium text-muted-foreground">{stat.label}</p>
+        {/* Stats grid */}
+        {stats ? (
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+              label="Total Events"
+              value={stats.totalEvents}
+              icon={<Calendar size={20} />}
+              tone="violet"
+              sub={stats.pendingEvents > 0 ? String(stats.pendingEvents) : undefined}
+            />
+            <StatCard
+              label="Total Users"
+              value={stats.totalUsers}
+              icon={<Users size={20} />}
+              tone="green"
+            />
+            <StatCard
+              label="Organizers"
+              value={stats.totalOrganizers}
+              icon={<Building2 size={20} />}
+              tone="blue"
+              sub={stats.pendingOrganizers > 0 ? String(stats.pendingOrganizers) : undefined}
+            />
+            <StatCard
+              label="Today's Orders"
+              value={stats.todayOrders}
+              icon={<TrendingUp size={20} />}
+              tone="amber"
+            />
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-border bg-muted/40 py-10 text-center text-sm text-muted-foreground">
+            Could not load dashboard stats. Check your connection or login status.
+          </div>
+        )}
+
+        {/* Today revenue */}
+        {stats && (
+          <div className="rounded-2xl border border-border bg-card p-5 shadow-card flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">Today's Revenue</p>
               <p className="mt-1 text-3xl font-extrabold tracking-tight text-foreground">
-                {stat.value}
+                {stats.todayRevenue?.toLocaleString()} EGP
               </p>
             </div>
-          ))}
-        </div>
+            <TrendingUp size={32} className="text-success/50" />
+          </div>
+        )}
 
-        {/* Two-column panels */}
+        {/* Pending actions panels */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-foreground">Recent Events</h2>
-              <button className="text-xs font-semibold text-primary hover:underline">
-                View all
-              </button>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-foreground">Pending Events</h2>
+              <Link to="/admin/events" className="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+                Review all <ArrowUpRight size={12} />
+              </Link>
             </div>
-            <div className="mt-6 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/40 py-12 text-center">
-              <Calendar size={28} className="text-muted-foreground/60" />
-              <p className="text-sm text-muted-foreground">
-                No events yet. Events will appear here once organizers create them.
-              </p>
-            </div>
+            {stats && stats.pendingEvents > 0 ? (
+              <div className="rounded-xl border border-warning/30 bg-warning/5 px-4 py-3 text-sm text-warning font-medium">
+                {stats.pendingEvents} event{stats.pendingEvents > 1 ? "s" : ""} awaiting approval
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/40 py-10 text-center">
+                <Calendar size={24} className="text-muted-foreground/60" />
+                <p className="text-sm text-muted-foreground">No pending events</p>
+              </div>
+            )}
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-6 shadow-card">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-foreground">Pending Approvals</h2>
-              <button className="text-xs font-semibold text-primary hover:underline">
-                View all
-              </button>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-foreground">Pending Organizers</h2>
+              <Link to="/admin/organizers" className="text-xs font-semibold text-primary hover:underline flex items-center gap-1">
+                Review all <ArrowUpRight size={12} />
+              </Link>
             </div>
-            <div className="mt-6 flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/40 py-12 text-center">
-              <Building2 size={28} className="text-muted-foreground/60" />
-              <p className="text-sm text-muted-foreground">
-                No pending approvals. Organizer and event review requests will appear here.
-              </p>
-            </div>
+            {stats && stats.pendingOrganizers > 0 ? (
+              <div className="rounded-xl border border-warning/30 bg-warning/5 px-4 py-3 text-sm text-warning font-medium">
+                {stats.pendingOrganizers} organizer{stats.pendingOrganizers > 1 ? "s" : ""} awaiting approval
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/40 py-10 text-center">
+                <Building2 size={24} className="text-muted-foreground/60" />
+                <p className="text-sm text-muted-foreground">No pending organizers</p>
+              </div>
+            )}
           </div>
         </div>
       </div>

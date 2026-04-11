@@ -1,11 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { listRecords } from "@/lib/admin-crud.functions";
-import { AdminCrudPage, StatusBadge, ColorSwatch, type ColumnDef, type FieldDef } from "@/components/admin/AdminCrudPage";
+import { useServerFn } from "@tanstack/react-start";
+import {
+  listCategoriesAdmin,
+  createCategoryAdmin,
+  updateCategoryAdmin,
+  deleteCategoryAdmin,
+} from "@/lib/admin-api.functions";
+import {
+  AdminCrudPage,
+  ColorSwatch,
+  type ColumnDef,
+  type FieldDef,
+  type ApiFns,
+} from "@/components/admin/AdminCrudPage";
 
 export const Route = createFileRoute("/admin/categories")({
   loader: async () => {
-    const data = await listRecords({ data: { table: "event_categories", orderBy: "sort_order", ascending: true } });
-    return { data };
+    const data = await listCategoriesAdmin();
+    return { data: Array.isArray(data) ? data : [] };
   },
   component: CategoriesPage,
 });
@@ -13,32 +25,48 @@ export const Route = createFileRoute("/admin/categories")({
 const columns: ColumnDef[] = [
   { key: "name_en", label: "Name (EN)" },
   { key: "name_ar", label: "Name (AR)" },
-  { key: "color_hex", label: "Color", render: (v) => <ColorSwatch hex={v} /> },
-  { key: "sort_order", label: "Order" },
-  { key: "is_active", label: "Status", render: (v) => <StatusBadge active={v} /> },
+  { key: "color", label: "Color", render: (v) => <ColorSwatch hex={v} /> },
+  { key: "sortOrder", label: "Order" },
 ];
 
 const fields: FieldDef[] = [
   { key: "name_en", label: "Name (English)", type: "text", required: true, placeholder: "e.g. Concerts" },
   { key: "name_ar", label: "Name (Arabic)", type: "text", required: true, placeholder: "e.g. حفلات" },
-  { key: "color_hex", label: "Color", type: "color", defaultValue: "#3B82F6" },
-  { key: "icon_url", label: "Icon URL", type: "text", placeholder: "https://..." },
-  { key: "sort_order", label: "Sort Order", type: "number", defaultValue: 0 },
-  { key: "is_active", label: "Active", type: "toggle", defaultValue: true },
+  { key: "color", label: "Color", type: "color", defaultValue: "#3B82F6" },
+  { key: "sortOrder", label: "Sort Order", type: "number", defaultValue: 0 },
 ];
 
 function CategoriesPage() {
   const { data } = Route.useLoaderData();
+
+  const createFn = useServerFn(createCategoryAdmin);
+  const updateFn = useServerFn(updateCategoryAdmin);
+  const deleteFn = useServerFn(deleteCategoryAdmin);
+
+  const apiFns: ApiFns = {
+    list: async () => {
+      const result = await listCategoriesAdmin();
+      return Array.isArray(result) ? result : [];
+    },
+    create: async (formData) => {
+      return createFn({ data: formData });
+    },
+    update: async (id, formData) => {
+      return updateFn({ data: { id, updates: formData } });
+    },
+    delete: async (id) => {
+      await deleteFn({ data: { id } });
+    },
+  };
+
   return (
     <AdminCrudPage
       title="Event Categories"
       subtitle="Manage event categories for the platform"
-      table="event_categories"
       columns={columns}
       fields={fields}
-      orderBy="sort_order"
-      ascending={true}
       initialData={data}
+      apiFns={apiFns}
     />
   );
 }
