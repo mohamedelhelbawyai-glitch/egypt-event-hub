@@ -8,8 +8,8 @@ import { formatEgp, maskPhone, type AdminOrderDetails } from "@/lib/orders-admin
 
 export const Route = createFileRoute("/admin/orders/$id")({
   loader: async ({ params }) => {
-    const order = await getOrderAdmin({ data: { id: params.id } });
-    return { order };
+    const order = await getOrderAdmin({ data: { id: params.id } }) as any;
+    return { order } as { order: AdminOrderDetails };
   },
   component: OrderDetailsPage,
 });

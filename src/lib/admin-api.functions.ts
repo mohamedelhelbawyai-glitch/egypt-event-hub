@@ -450,7 +450,7 @@ export const listOrdersAdmin = createServerFn({ method: "GET" })
       endDate: z.string().optional(),
     })
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<any> => {
     const token = requireAdminToken();
 
     const page = data.page ?? 1;
@@ -475,9 +475,6 @@ export const listOrdersAdmin = createServerFn({ method: "GET" })
         backendGap: false,
       };
     } catch (error) {
-      // Live backend currently does not expose admin order routes.
-      // Return an empty dataset with an explicit backend gap flag instead of
-      // falling back to user-scoped routes that reject admin tokens.
       if (error instanceof ApiError && error.status === 404) {
         return {
           rows: [],
@@ -497,7 +494,7 @@ export const getOrderAdmin = createServerFn({ method: "GET" })
       id: z.string(),
     })
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<any> => {
     const token = requireAdminToken();
 
     try {
@@ -531,7 +528,7 @@ export const refundOrderAdmin = createServerFn({ method: "POST" })
       id: z.string(),
     })
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<any> => {
     const token = requireAdminToken();
     const result = await ordersApi.refundAdmin(data.id, token);
     return unwrapData<Record<string, unknown>>(result);

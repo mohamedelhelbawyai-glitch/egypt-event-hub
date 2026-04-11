@@ -107,7 +107,7 @@ function NewVenuePage() {
         facilityIds: form.facilityIds,
       };
 
-      const created = await createFn({ data: payload });
+      const created = await createFn({ data: payload as Record<string, unknown> });
       if (created?.id) {
         navigate({ to: "/admin/venues/$id", params: { id: created.id } });
       } else {
