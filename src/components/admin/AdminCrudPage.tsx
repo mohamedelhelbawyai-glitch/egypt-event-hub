@@ -27,15 +27,31 @@ export interface FieldDef {
   defaultValue?: any;
 }
 
+export interface ApiFns {
+  list?: () => Promise<Record<string, any>[]>;
+  create?: (data: Record<string, any>) => Promise<Record<string, any>>;
+  update?: (id: string, data: Record<string, any>) => Promise<Record<string, any>>;
+  delete?: (id: string) => Promise<void>;
+}
+
 interface AdminCrudPageProps {
   title: string;
   subtitle: string;
-  table: string;
   columns: ColumnDef[];
-  fields: FieldDef[];
+  fields?: FieldDef[];
+  initialData: Record<string, any>[];
+  // Supabase legacy mode
+  table?: string;
   orderBy?: string;
   ascending?: boolean;
-  initialData: Record<string, any>[];
+  // Backend API mode
+  apiFns?: ApiFns;
+  // Custom row actions (replaces or supplements edit/delete)
+  rowActions?: (row: Record<string, any>, refresh: () => Promise<void>) => React.ReactNode;
+  // Control visibility
+  hideCreate?: boolean;
+  hideEdit?: boolean;
+  hideDelete?: boolean;
 }
 
 // ─── Component ───────────────────────────────────────────
@@ -45,10 +61,15 @@ export function AdminCrudPage({
   subtitle,
   table,
   columns,
-  fields,
+  fields = [],
   orderBy,
   ascending,
   initialData,
+  apiFns,
+  rowActions,
+  hideCreate = false,
+  hideEdit = false,
+  hideDelete = false,
 }: AdminCrudPageProps) {
   const [data, setData] = useState<Record<string, any>[]>(initialData);
   const [search, setSearch] = useState("");
@@ -57,17 +78,28 @@ export function AdminCrudPage({
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
+  // Legacy Supabase fns (only used when apiFns not provided)
   const createFn = useServerFn(createRecord);
   const updateFn = useServerFn(updateRecord);
   const deleteFn = useServerFn(deleteRecord);
   const toggleFn = useServerFn(toggleField);
 
+  const isApiMode = !!apiFns;
+
   const refresh = async () => {
     try {
-      const rows = await listRecords({ data: { table, orderBy, ascending } });
-      setData(rows);
-    } catch {}
+      if (isApiMode && apiFns?.list) {
+        const rows = await apiFns.list();
+        setData(rows);
+      } else if (table) {
+        const rows = await listRecords({ data: { table, orderBy, ascending } });
+        setData(rows);
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to refresh");
+    }
   };
 
   const filtered = data.filter((row) => {
@@ -104,16 +136,25 @@ export function AdminCrudPage({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError(null);
     try {
-      if (editing) {
-        await updateFn({ data: { table, id: editing.id, updates: formData } });
-      } else {
-        await createFn({ data: { table, record: formData } });
+      if (isApiMode) {
+        if (editing) {
+          await apiFns?.update?.(editing.id, formData);
+        } else {
+          await apiFns?.create?.(formData);
+        }
+      } else if (table) {
+        if (editing) {
+          await updateFn({ data: { table, id: editing.id, updates: formData } });
+        } else {
+          await createFn({ data: { table, record: formData } });
+        }
       }
       setShowForm(false);
       await refresh();
     } catch (err: any) {
-      alert(err.message || "Operation failed");
+      setError(err.message || "Operation failed");
     } finally {
       setLoading(false);
     }
@@ -122,12 +163,17 @@ export function AdminCrudPage({
   const handleDelete = async () => {
     if (!deleteId) return;
     setLoading(true);
+    setError(null);
     try {
-      await deleteFn({ data: { table, id: deleteId } });
+      if (isApiMode) {
+        await apiFns?.delete?.(deleteId);
+      } else if (table) {
+        await deleteFn({ data: { table, id: deleteId } });
+      }
       setDeleteId(null);
       await refresh();
     } catch (err: any) {
-      alert(err.message || "Delete failed");
+      setError(err.message || "Delete failed");
     } finally {
       setLoading(false);
     }
@@ -135,10 +181,17 @@ export function AdminCrudPage({
 
   const handleToggle = async (id: string, field: string, value: boolean) => {
     try {
-      await toggleFn({ data: { table, id, field, value } });
-      await refresh();
+      if (table && !isApiMode) {
+        await toggleFn({ data: { table, id, field, value } });
+        await refresh();
+      }
     } catch {}
   };
+
+  const showEditBtn = !hideEdit && fields.length > 0;
+  const showDeleteBtn = !hideDelete && (isApiMode ? !!apiFns?.delete : !!table);
+  const showCreateBtn = !hideCreate && fields.length > 0;
+  const hasActions = showEditBtn || showDeleteBtn || !!rowActions;
 
   return (
     <>
@@ -150,17 +203,27 @@ export function AdminCrudPage({
           </p>
           <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-foreground">{title}</h1>
         </div>
-        <button
-          onClick={openCreate}
-          className="inline-flex items-center gap-2 rounded-xl admin-gradient px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-brand transition-transform hover:-translate-y-0.5"
-        >
-          <Plus size={16} strokeWidth={2.5} />
-          Add New
-        </button>
+        {showCreateBtn && (
+          <button
+            onClick={openCreate}
+            className="inline-flex items-center gap-2 rounded-xl admin-gradient px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-brand transition-transform hover:-translate-y-0.5"
+          >
+            <Plus size={16} strokeWidth={2.5} />
+            Add New
+          </button>
+        )}
       </div>
 
       {/* Content */}
       <div className="p-8">
+        {/* Error Banner */}
+        {error && (
+          <div className="mb-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive flex items-center justify-between">
+            <span>{error}</span>
+            <button onClick={() => setError(null)} className="text-destructive/70 hover:text-destructive font-bold ml-4">✕</button>
+          </div>
+        )}
+
         {/* Search */}
         <div className="mb-5 relative max-w-sm">
           <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -187,15 +250,17 @@ export function AdminCrudPage({
                       {col.label}
                     </th>
                   ))}
-                  <th className="px-5 py-3.5 text-right text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Actions
-                  </th>
+                  {hasActions && (
+                    <th className="px-5 py-3.5 text-right text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                      Actions
+                    </th>
+                  )}
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={columns.length + 1} className="px-5 py-16 text-center">
+                    <td colSpan={columns.length + (hasActions ? 1 : 0)} className="px-5 py-16 text-center">
                       <div className="flex flex-col items-center gap-2">
                         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-muted">
                           <Search size={18} className="text-muted-foreground" />
@@ -218,22 +283,31 @@ export function AdminCrudPage({
                         {col.render ? col.render(row[col.key], row) : String(row[col.key] ?? "")}
                       </td>
                     ))}
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => openEdit(row)}
-                          className="rounded-lg p-2 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
-                        >
-                          <Pencil size={14} />
-                        </button>
-                        <button
-                          onClick={() => setDeleteId(row.id)}
-                          className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </td>
+                    {hasActions && (
+                      <td className="px-5 py-3.5 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          {rowActions?.(row, refresh)}
+                          {showEditBtn && (
+                            <button
+                              onClick={() => openEdit(row)}
+                              className="rounded-lg p-2 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                              title="Edit"
+                            >
+                              <Pencil size={14} />
+                            </button>
+                          )}
+                          {showDeleteBtn && (
+                            <button
+                              onClick={() => setDeleteId(row.id)}
+                              className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -246,7 +320,7 @@ export function AdminCrudPage({
       </div>
 
       {/* Create/Edit Dialog */}
-      {showForm && (
+      {showForm && fields.length > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/40 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl border border-border bg-card shadow-pop max-h-[85vh] overflow-hidden flex flex-col">
             <div className="flex items-center justify-between border-b border-border px-6 py-4">
@@ -259,6 +333,11 @@ export function AdminCrudPage({
                 </h2>
               </div>
             </div>
+            {error && (
+              <div className="mx-6 mt-4 rounded-xl border border-destructive/30 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+                {error}
+              </div>
+            )}
             <form id="admin-crud-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto scrollbar-thin px-6 py-5 space-y-4">
               {fields.map((field) => (
                 <div key={field.key}>
@@ -425,6 +504,35 @@ export function StatusBadge({ active }: { active: boolean }) {
   );
 }
 
+export function ApiStatusBadge({ status }: { status: string }) {
+  const variants: Record<string, string> = {
+    ACTIVE: "bg-success/10 text-success ring-success/20",
+    APPROVED: "bg-success/10 text-success ring-success/20",
+    PUBLISHED: "bg-success/10 text-success ring-success/20",
+    ON_SALE: "bg-success/10 text-success ring-success/20",
+    LIVE: "bg-primary/10 text-primary ring-primary/20",
+    PENDING: "bg-warning/10 text-warning ring-warning/20",
+    PENDING_REVIEW: "bg-warning/10 text-warning ring-warning/20",
+    DRAFT: "bg-muted text-muted-foreground ring-border",
+    SUSPENDED: "bg-orange-100 text-orange-700 ring-orange-200",
+    BANNED: "bg-destructive/10 text-destructive ring-destructive/20",
+    REJECTED: "bg-destructive/10 text-destructive ring-destructive/20",
+    CANCELLED: "bg-destructive/10 text-destructive ring-destructive/20",
+    FAILED: "bg-destructive/10 text-destructive ring-destructive/20",
+    REFUNDED: "bg-primary/10 text-primary ring-primary/20",
+    PARTIALLY_REFUNDED: "bg-orange-100 text-orange-700 ring-orange-200",
+    COMPLETED: "bg-muted text-muted-foreground ring-border",
+    ARCHIVED: "bg-muted text-muted-foreground ring-border",
+    SOLD_OUT: "bg-orange-100 text-orange-700 ring-orange-200",
+  };
+  const cls = variants[status] ?? "bg-muted text-muted-foreground ring-border";
+  return (
+    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold ring-1 ring-inset ${cls}`}>
+      {status?.replace(/_/g, " ")}
+    </span>
+  );
+}
+
 export function ColorSwatch({ hex }: { hex: string | null }) {
   if (!hex) return <span className="text-muted-foreground">—</span>;
   return (
@@ -434,6 +542,46 @@ export function ColorSwatch({ hex }: { hex: string | null }) {
         style={{ backgroundColor: hex }}
       />
       <span className="text-xs font-mono text-muted-foreground">{hex}</span>
+    </div>
+  );
+}
+
+// ─── No API Placeholder ──────────────────────────────────
+
+export function NoApiPage({ title, subtitle, missingApis }: {
+  title: string;
+  subtitle: string;
+  missingApis: string[];
+}) {
+  return (
+    <div className="flex flex-col h-full">
+      <div className="border-b border-border bg-card/70 backdrop-blur px-8 py-6">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{subtitle}</p>
+        <h1 className="mt-1 text-2xl font-extrabold tracking-tight text-foreground">{title}</h1>
+      </div>
+      <div className="flex flex-1 items-center justify-center p-8">
+        <div className="max-w-md text-center">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-warning/10">
+            <span className="text-2xl">🚧</span>
+          </div>
+          <h2 className="text-lg font-extrabold text-foreground">Backend API Not Available</h2>
+          <p className="mt-2 text-sm text-muted-foreground">
+            This section requires backend API endpoints that have not been implemented yet.
+            Please build the following APIs to enable this feature:
+          </p>
+          <div className="mt-4 rounded-xl border border-border bg-muted/40 p-4 text-left space-y-1.5">
+            {missingApis.map((api) => (
+              <div key={api} className="flex items-center gap-2 text-sm font-mono">
+                <span className="text-destructive">✗</span>
+                <span className="text-foreground">{api}</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Once these endpoints are ready, this page will be fully functional.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

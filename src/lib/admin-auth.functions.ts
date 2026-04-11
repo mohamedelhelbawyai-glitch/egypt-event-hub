@@ -13,7 +13,7 @@ const COOKIE_EMAIL = "tazkara-admin-email";
 const COOKIE_EXPIRES = "tazkara-admin-exp";
 const COOKIE_OPTS = {
   httpOnly: true,
-  secure: true,
+  secure: process.env.NODE_ENV === "production",
   path: "/",
   maxAge: 60 * 60 * 8, // 8 hours
 } as const;
@@ -114,3 +114,4 @@ export const getAdminSession = createServerFn({ method: "GET" }).handler(
     };
   }
 );
+
