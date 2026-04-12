@@ -39,7 +39,7 @@ const DEFAULT_FILTERS: FiltersState = {
 
 export const Route = createFileRoute("/admin/orders")({
   loader: async () => {
-    const list = await listOrdersAdmin({ data: { page: 1, limit: 20 } });
+    const list = await listOrdersAdmin({ data: { page: 1, limit: 20 } }) as any;
     return list;
   },
   component: OrdersPage,
