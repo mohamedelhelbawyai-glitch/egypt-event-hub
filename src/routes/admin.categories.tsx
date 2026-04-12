@@ -23,16 +23,16 @@ export const Route = createFileRoute("/admin/categories")({
 });
 
 const columns: ColumnDef[] = [
-  { key: "name_en", label: "Name (EN)" },
-  { key: "name_ar", label: "Name (AR)" },
-  { key: "color", label: "Color", render: (v) => <ColorSwatch hex={v} /> },
+  { key: "nameEn", label: "Name (EN)" },
+  { key: "nameAr", label: "Name (AR)" },
+  { key: "colorHex", label: "Color", render: (v) => <ColorSwatch hex={v} /> },
   { key: "sortOrder", label: "Order" },
 ];
 
 const fields: FieldDef[] = [
-  { key: "name_en", label: "Name (English)", type: "text", required: true, placeholder: "e.g. Concerts" },
-  { key: "name_ar", label: "Name (Arabic)", type: "text", required: true, placeholder: "e.g. حفلات" },
-  { key: "color", label: "Color", type: "color", defaultValue: "#3B82F6" },
+  { key: "nameEn", label: "Name (English)", type: "text", required: true, placeholder: "e.g. Concerts" },
+  { key: "nameAr", label: "Name (Arabic)", type: "text", required: true, placeholder: "e.g. حفلات" },
+  { key: "colorHex", label: "Color", type: "color", defaultValue: "#3B82F6" },
   { key: "sortOrder", label: "Sort Order", type: "number", defaultValue: 0 },
 ];
 

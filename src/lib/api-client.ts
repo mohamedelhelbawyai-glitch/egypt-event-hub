@@ -428,10 +428,14 @@ export const venuesApi = {
 
 export interface Category {
   id: string;
-  name_en: string;
-  name_ar: string;
-  color?: string;
+  nameEn: string;
+  nameAr: string;
+  iconUrl: string | null;
+  colorHex: string | null;
   sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Tag {
@@ -750,8 +754,13 @@ export const categoriesApi = {
     request<Category[]>("/events/categories"),
 
   // Admin
-  listAdmin: (token: string) =>
-    request<Category[]>("/admin/categories", { token }),
+  listAdmin: async (token: string) => {
+    const response = await request<{ success: boolean; data: Category[] }>(
+      "/admin/categories",
+      { token }
+    );
+    return response.data || [];
+  },
 
   createAdmin: (data: any, token: string) =>
     request<Category>("/admin/categories", { method: "POST", body: data, token }),
