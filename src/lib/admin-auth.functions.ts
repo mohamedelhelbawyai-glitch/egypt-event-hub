@@ -59,22 +59,27 @@ export const adminLogin = createServerFn({ method: "POST" })
     });
 
     const authResponse = (await res.json()) as {
-      accessToken: string;
-      expiresIn: number;
-      tokenType: string;
+      success: boolean;
+      data?: {
+        accessToken: string;
+        expiresIn: number;
+        tokenType: string;
+      };
+      message?: string;
     };
 
     if (!res.ok) {
-      const msg =
-        typeof authResponse === "object" && authResponse && "message" in authResponse
-          ? String((authResponse as { message: string }).message)
-          : "Invalid email or password";
+      const msg = authResponse.message || "Invalid email or password";
       throw new Error(msg);
     }
 
-    const expiresAt = Date.now() + authResponse.expiresIn * 1000;
+    if (!authResponse.data?.accessToken) {
+      throw new Error("Invalid response from server: missing access token");
+    }
 
-    setCookie(COOKIE_TOKEN, authResponse.accessToken, COOKIE_OPTS);
+    const expiresAt = Date.now() + authResponse.data.expiresIn * 1000;
+
+    setCookie(COOKIE_TOKEN, authResponse.data.accessToken, COOKIE_OPTS);
     setCookie(COOKIE_EMAIL, data.email, COOKIE_OPTS);
     setCookie(COOKIE_EXPIRES, String(expiresAt), COOKIE_OPTS);
 
