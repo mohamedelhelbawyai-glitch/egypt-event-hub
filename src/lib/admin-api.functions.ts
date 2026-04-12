@@ -12,6 +12,7 @@ import {
   venuesApi,
   organizersApi,
   usersApi,
+  governoratesApi,
   categoriesApi,
   tagsApi,
   paymentMethodsApi,
@@ -71,8 +72,8 @@ export const listEventsAdmin = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const token = requireAdminToken();
-    const result = await eventsApi.listAdmin(data.page ?? 1, data.limit ?? 20, token);
-    return result;
+    const result = await eventsApi.listAdmin(data.page ?? 1, data.limit ?? 100, token);
+    return Array.isArray(result) ? result : [];
   });
 
 export const createEventAdmin = createServerFn({ method: "POST" })
@@ -108,6 +109,48 @@ export const deleteEventAdmin = createServerFn({ method: "POST" })
     return { success: true };
   });
 
+// ─── Governorates ────────────────────────────────────────
+
+export const listGovernoratesAdmin = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const token = requireAdminToken();
+    const result = await governoratesApi.listAdmin(token);
+    return Array.isArray(result) ? result : [];
+  });
+
+export const createGovernorateAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.record(z.string(), z.unknown()))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    const result = await governoratesApi.createAdmin(data as any, token);
+    return result;
+  });
+
+export const updateGovernorateAdmin = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      id: z.string(),
+      updates: z.record(z.string(), z.unknown()),
+    })
+  )
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    const result = await governoratesApi.updateAdmin(data.id, data.updates as any, token);
+    return result;
+  });
+
+export const deleteGovernorateAdmin = createServerFn({ method: "POST" })
+  .inputValidator(
+    z.object({
+      id: z.string(),
+    })
+  )
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await governoratesApi.deleteAdmin(data.id, token);
+    return { success: true };
+  });
+
 // ─── Venues ──────────────────────────────────────────────
 
 export const listVenuesAdmin = createServerFn({ method: "GET" })
@@ -120,17 +163,17 @@ export const listVenuesAdmin = createServerFn({ method: "GET" })
     })
   )
   .handler(async ({ data }) => {
+    const token = requireAdminToken();
     const filters: VenueListFilters = {
       governorateId: data.governorateId,
       type: data.type,
     };
-    const result = await venuesApi.listPublicVenues(data.page ?? 1, data.limit ?? 20, filters);
-    const payload = unwrapData<{ data: Venue[]; total: number; page: number; limit: number }>(result);
+    const result = await venuesApi.listAdmin(data.page ?? 1, data.limit ?? 20, token, filters);
     return {
-      rows: Array.isArray(payload.data) ? payload.data : [],
-      total: payload.total ?? 0,
-      page: payload.page ?? data.page ?? 1,
-      limit: payload.limit ?? data.limit ?? 20,
+      rows: Array.isArray(result) ? result : [],
+      total: (result as any)?.total ?? result.length ?? 0,
+      page: data.page ?? 1,
+      limit: data.limit ?? 20,
     } as any;
   });
 
@@ -238,8 +281,8 @@ export const listOrganizersAdmin = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const token = requireAdminToken();
-    const result = await organizersApi.listAdmin(data.page ?? 1, data.limit ?? 20, token);
-    return result;
+    const result = await organizersApi.listAdmin(data.page ?? 1, data.limit ?? 100, token);
+    return Array.isArray(result) ? result : [];
   });
 
 export const updateOrganizerAdmin = createServerFn({ method: "POST" })
@@ -278,8 +321,8 @@ export const listUsersAdmin = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const token = requireAdminToken();
-    const result = await usersApi.listAdmin(data.page ?? 1, data.limit ?? 20, token);
-    return result;
+    const result = await usersApi.listAdmin(data.page ?? 1, data.limit ?? 100, token);
+    return Array.isArray(result) ? result : [];
   });
 
 export const updateUserAdmin = createServerFn({ method: "POST" })
@@ -397,7 +440,7 @@ export const listPaymentMethodsAdmin = createServerFn({ method: "GET" })
   .handler(async () => {
     const token = requireAdminToken();
     const result = await paymentMethodsApi.listAdmin(token);
-    return result;
+    return Array.isArray(result) ? result : [];
   });
 
 export const createPaymentMethodAdmin = createServerFn({ method: "POST" })
@@ -470,8 +513,9 @@ export const listOrdersAdmin = createServerFn({ method: "GET" })
 
     try {
       const result = await ordersApi.listAdmin(page, limit, token, filters);
+      const listResult = Array.isArray(result) ? { rows: result } : result;
       return {
-        ...normalizeOrdersListResponse(result, { page, limit }),
+        ...normalizeOrdersListResponse(listResult, { page, limit }),
         backendGap: false,
       };
     } catch (error) {

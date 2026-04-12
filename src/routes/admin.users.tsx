@@ -14,8 +14,8 @@ export const Route = createFileRoute("/admin/users")({
       listUsersAdmin({ data: { page: 1, limit: 100 } }),
       getAdminSession(),
     ]);
-    const rows = result?.data ?? result ?? [];
-    return { data: Array.isArray(rows) ? rows : [], token: session.admin?.accessToken ?? "" };
+    const rows = Array.isArray(result) ? result : [];
+    return { data: rows, token: session.admin?.accessToken ?? "" };
   },
   component: UsersPage,
 });
@@ -119,8 +119,7 @@ function UsersPage() {
       apiFns={{
         list: async () => {
           const result = await listFn({ data: { page: 1, limit: 100 } });
-          const rows = result?.data ?? result ?? [];
-          return Array.isArray(rows) ? rows : [];
+          return Array.isArray(result) ? result : [];
         },
       }}
       rowActions={(row, refresh) => (

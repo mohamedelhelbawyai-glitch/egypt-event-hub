@@ -13,8 +13,8 @@ export const Route = createFileRoute("/admin/events")({
       listEventsAdmin({ data: { page: 1, limit: 100 } }),
       getAdminSession(),
     ]);
-    const rows = eventsResult?.data ?? eventsResult ?? [];
-    return { data: Array.isArray(rows) ? rows : [], token: session.admin?.accessToken ?? "" };
+    const rows = Array.isArray(eventsResult) ? eventsResult : [];
+    return { data: rows, token: session.admin?.accessToken ?? "" };
   },
   component: EventsPage,
 });
@@ -130,8 +130,7 @@ function EventsPage() {
       apiFns={{
         list: async () => {
           const result = await listFn({ data: { page: 1, limit: 100 } });
-          const rows = result?.data ?? result ?? [];
-          return Array.isArray(rows) ? rows : [];
+          return Array.isArray(result) ? result : [];
         },
       }}
       rowActions={(row, refresh) => (

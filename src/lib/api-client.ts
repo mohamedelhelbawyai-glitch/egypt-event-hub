@@ -177,8 +177,13 @@ export const usersApi = {
     }),
 
   // Admin
-  listAdmin: (page = 1, limit = 20, token: string) =>
-    request<any>(`/admin/users?page=${page}&limit=${limit}`, { token }),
+  listAdmin: async (page = 1, limit = 20, token: string) => {
+    const response = await request<{ success: boolean; data: UserProfile[] }>(
+      `/admin/users?page=${page}&limit=${limit}`,
+      { token }
+    );
+    return response.data || [];
+  },
 
   getAdmin: (id: string, token: string) =>
     request<UserProfile>(`/admin/users/${id}`, { token }),
@@ -256,11 +261,21 @@ export const organizersApi = {
     request<OrganizerProfile>(`/organizers/${id}`),
 
   // Admin
-  listAdmin: (page = 1, limit = 20, token: string) =>
-    request<any>(`/admin/organizers?page=${page}&limit=${limit}`, { token }),
+  listAdmin: async (page = 1, limit = 20, token: string) => {
+    const response = await request<{ success: boolean; data: OrganizerProfile[] }>(
+      `/admin/organizers?page=${page}&limit=${limit}`,
+      { token }
+    );
+    return response.data || [];
+  },
 
-  listPendingAdmin: (token: string, page = 1, limit = 20) =>
-    request<any>(`/admin/organizers/pending?page=${page}&limit=${limit}`, { token }),
+  listPendingAdmin: async (token: string, page = 1, limit = 20) => {
+    const response = await request<{ success: boolean; data: OrganizerProfile[] }>(
+      `/admin/organizers/pending?page=${page}&limit=${limit}`,
+      { token }
+    );
+    return response.data || [];
+  },
 
   getAdmin: (id: string, token: string) =>
     request<OrganizerProfile>(`/admin/organizers/${id}`, { token }),
@@ -409,6 +424,27 @@ export const venuesApi = {
   getPublicVenue: (id: string) =>
     request<any>(`/venues/${id}`),
 
+  // Admin - list venues
+  listAdmin: async (page = 1, limit = 20, token: string, filters?: VenueListFilters) => {
+    const response = await request<{ success: boolean; data: Venue[] }>(
+      `/admin/venues?${buildVenueListQuery(page, limit, filters)}`,
+      { token }
+    );
+    return response.data || [];
+  },
+
+  getAdmin: (id: string, token: string) =>
+    request<Venue>(`/admin/venues/${id}`, { token }),
+
+  createAdmin: (data: CreateVenueRequest, token: string) =>
+    request<Venue>("/admin/venues", { method: "POST", body: data, token }),
+
+  updateAdmin: (id: string, data: UpdateVenueRequest, token: string) =>
+    request<Venue>(`/admin/venues/${id}`, { method: "PATCH", body: data, token }),
+
+  deleteAdmin: (id: string, token: string) =>
+    request<any>(`/admin/venues/${id}`, { method: "DELETE", token }),
+
   // Admin moderation
   approveAdmin: (id: string, token: string) =>
     request<any>(`/admin/venues/${id}/approve`, { method: "POST", token }),
@@ -422,6 +458,37 @@ export const venuesApi = {
 
   archiveAdmin: (id: string, token: string) =>
     request<any>(`/admin/venues/${id}/archive`, { method: "POST", token }),
+};
+
+// ─── Governorates API ──────────────────────────────────
+
+export interface Governorate {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  code?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const governoratesApi = {
+  // Admin
+  listAdmin: async (token: string) => {
+    const response = await request<{ success: boolean; data: Governorate[] }>(
+      "/admin/governorates",
+      { token }
+    );
+    return response.data || [];
+  },
+
+  createAdmin: (data: any, token: string) =>
+    request<Governorate>("/admin/governorates", { method: "POST", body: data, token }),
+
+  updateAdmin: (id: string, data: any, token: string) =>
+    request<Governorate>(`/admin/governorates/${id}`, { method: "PATCH", body: data, token }),
+
+  deleteAdmin: (id: string, token: string) =>
+    request<any>(`/admin/governorates/${id}`, { method: "DELETE", token }),
 };
 
 // ─── Events API ──────────────────────────────────────────
@@ -593,11 +660,21 @@ export const eventsApi = {
     request<Event>(`/events/${id}`),
 
   // Admin
-  listAdmin: (page = 1, limit = 20, token: string) =>
-    request<any>(`/admin/events?page=${page}&limit=${limit}`, { token }),
+  listAdmin: async (page = 1, limit = 20, token: string) => {
+    const response = await request<{ success: boolean; data: any[] }>(
+      `/admin/events?page=${page}&limit=${limit}`,
+      { token }
+    );
+    return response.data || [];
+  },
 
-  listPendingAdmin: (page = 1, limit = 20, token: string) =>
-    request<any>(`/admin/events/pending?page=${page}&limit=${limit}`, { token }),
+  listPendingAdmin: async (page = 1, limit = 20, token: string) => {
+    const response = await request<{ success: boolean; data: any[] }>(
+      `/admin/events/pending?page=${page}&limit=${limit}`,
+      { token }
+    );
+    return response.data || [];
+  },
 
   getAdmin: (id: string, token: string) =>
     request<Event>(`/admin/events/${id}`, { token }),
@@ -714,8 +791,13 @@ export const ordersApi = {
     request<any>(`/orders/my/${id}/cancel`, { method: "POST", token }),
 
   // Admin
-  listAdmin: (page = 1, limit = 20, token: string, filters?: OrdersListFilters) =>
-    request<any>(`/admin/orders?${buildOrdersQuery(page, limit, filters)}`, { token }),
+  listAdmin: async (page = 1, limit = 20, token: string, filters?: OrdersListFilters) => {
+    const response = await request<{ success: boolean; data: any[] }>(
+      `/admin/orders?${buildOrdersQuery(page, limit, filters)}`,
+      { token }
+    );
+    return response.data || [];
+  },
 
   getAdmin: (id: string, token: string) =>
     request<Order>(`/admin/orders/${id}`, { token }),
@@ -810,8 +892,13 @@ export interface PaymentMethod {
 
 export const paymentMethodsApi = {
   // Admin
-  listAdmin: (token: string) =>
-    request<PaymentMethod[]>("/admin/payment-methods", { token }),
+  listAdmin: async (token: string) => {
+    const response = await request<{ success: boolean; data: PaymentMethod[] }>(
+      "/admin/payment-methods",
+      { token }
+    );
+    return response.data || [];
+  },
 
   getAdmin: (id: string, token: string) =>
     request<PaymentMethod>(`/admin/payment-methods/${id}`, { token }),
