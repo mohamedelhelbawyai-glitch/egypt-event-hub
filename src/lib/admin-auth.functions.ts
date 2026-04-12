@@ -55,22 +55,22 @@ export const adminLogin = createServerFn({ method: "POST" })
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email: data.email, password: data.password }),
+      credentials: "include",
     });
-
-    if (!res.ok) {
-      let msg = "Invalid email or password";
-      try {
-        const err = await res.json();
-        if (err.message) msg = err.message;
-      } catch {}
-      throw new Error(msg);
-    }
 
     const authResponse = (await res.json()) as {
       accessToken: string;
       expiresIn: number;
       tokenType: string;
     };
+
+    if (!res.ok) {
+      const msg =
+        typeof authResponse === "object" && authResponse && "message" in authResponse
+          ? String((authResponse as { message: string }).message)
+          : "Invalid email or password";
+      throw new Error(msg);
+    }
 
     const expiresAt = Date.now() + authResponse.expiresIn * 1000;
 

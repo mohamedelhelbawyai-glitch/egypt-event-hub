@@ -45,6 +45,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
       method,
       headers: reqHeaders,
       body: body ? JSON.stringify(body) : undefined,
+      credentials: "include",
     });
 
     if (!res.ok) {
