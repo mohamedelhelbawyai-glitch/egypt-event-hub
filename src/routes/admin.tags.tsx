@@ -17,12 +17,14 @@ export const Route = createFileRoute("/admin/tags")({
 });
 
 const columns: ColumnDef[] = [
-  { key: "name", label: "Name" },
-  { key: "popularity", label: "Popularity" },
+  { key: "nameEn", label: "Name (English)" },
+  { key: "nameAr", label: "Name (Arabic)" },
+  { key: "usageCount", label: "Usage Count" },
 ];
 
 const fields: FieldDef[] = [
-  { key: "name", label: "Name", type: "text", required: true, placeholder: "e.g. Music" },
+  { key: "nameEn", label: "Name (English)", type: "text", required: true, placeholder: "e.g. Music" },
+  { key: "nameAr", label: "Name (Arabic)", type: "text", required: true, placeholder: "e.g. موسيقى" },
 ];
 
 function TagsPage() {
