@@ -436,8 +436,13 @@ export interface Category {
 
 export interface Tag {
   id: string;
-  name: string;
-  popularity: number;
+  nameEn: string;
+  nameAr: string;
+  isFeatured: boolean;
+  usageCount: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface TicketType {
@@ -765,8 +770,13 @@ export const tagsApi = {
     request<Tag[]>("/events/tags"),
 
   // Admin
-  listAdmin: (token: string) =>
-    request<Tag[]>("/admin/tags", { token }),
+  listAdmin: async (token: string) => {
+    const response = await request<{ success: boolean; data: Tag[] }>(
+      "/admin/tags",
+      { token }
+    );
+    return response.data || [];
+  },
 
   createAdmin: (data: any, token: string) =>
     request<Tag>("/admin/tags", { method: "POST", body: data, token }),
