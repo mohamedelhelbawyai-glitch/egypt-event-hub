@@ -182,11 +182,11 @@ export const usersApi = {
 
   // Admin
   listAdmin: async (page = 1, limit = 20, token: string) => {
-    const response = await request<{ success: boolean; data: UserProfile[] }>(
+    const response = await request<{ success: boolean; data: { data: UserProfile[]; total: number; page: number; limit: number } }>(
       `/admin/users?page=${page}&limit=${limit}`,
       { token }
     );
-    return response.data || [];
+    return response.data || { data: [] };
   },
 
   getAdmin: (id: string, token: string) =>
@@ -266,19 +266,19 @@ export const organizersApi = {
 
   // Admin
   listAdmin: async (page = 1, limit = 20, token: string) => {
-    const response = await request<{ success: boolean; data: OrganizerProfile[] }>(
+    const response = await request<{ success: boolean; data: { rows: OrganizerProfile[]; total: number; page: number; limit: number } }>(
       `/admin/organizers?page=${page}&limit=${limit}`,
       { token }
     );
-    return response.data || [];
+    return response.data || { rows: [] };
   },
 
   listPendingAdmin: async (token: string, page = 1, limit = 20) => {
-    const response = await request<{ success: boolean; data: OrganizerProfile[] }>(
+    const response = await request<{ success: boolean; data: { rows: OrganizerProfile[]; total: number; page: number; limit: number } }>(
       `/admin/organizers/pending?page=${page}&limit=${limit}`,
       { token }
     );
-    return response.data || [];
+    return response.data || { rows: [] };
   },
 
   getAdmin: (id: string, token: string) =>
@@ -430,11 +430,11 @@ export const venuesApi = {
 
   // Admin - list venues
   listAdmin: async (page = 1, limit = 20, token: string, filters?: VenueListFilters) => {
-    const response = await request<{ success: boolean; data: Venue[] }>(
+    const response = await request<{ success: boolean; data: { rows: Venue[]; total: number; page: number; limit: number } }>(
       `/admin/venues?${buildVenueListQuery(page, limit, filters)}`,
       { token }
     );
-    return response.data || [];
+    return response.data || { rows: [] };
   },
 
   getAdmin: (id: string, token: string) =>
@@ -665,19 +665,19 @@ export const eventsApi = {
 
   // Admin
   listAdmin: async (page = 1, limit = 20, token: string) => {
-    const response = await request<{ success: boolean; data: any[] }>(
+    const response = await request<{ success: boolean; data: { rows: any[]; total: number; page: number; limit: number } }>(
       `/admin/events?page=${page}&limit=${limit}`,
       { token }
     );
-    return response.data || [];
+    return response.data || { rows: [] };
   },
 
   listPendingAdmin: async (page = 1, limit = 20, token: string) => {
-    const response = await request<{ success: boolean; data: any[] }>(
+    const response = await request<{ success: boolean; data: { rows: any[]; total: number; page: number; limit: number } }>(
       `/admin/events/pending?page=${page}&limit=${limit}`,
       { token }
     );
-    return response.data || [];
+    return response.data || { rows: [] };
   },
 
   getAdmin: (id: string, token: string) =>
@@ -796,11 +796,11 @@ export const ordersApi = {
 
   // Admin
   listAdmin: async (page = 1, limit = 20, token: string, filters?: OrdersListFilters) => {
-    const response = await request<{ success: boolean; data: any[] }>(
+    const response = await request<{ success: boolean; data: { data: any[]; total: number; page: number; limit: number } }>(
       `/admin/orders?${buildOrdersQuery(page, limit, filters)}`,
       { token }
     );
-    return response.data || [];
+    return response.data || { data: [] };
   },
 
   getAdmin: (id: string, token: string) =>
