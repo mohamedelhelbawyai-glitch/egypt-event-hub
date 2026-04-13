@@ -52,6 +52,8 @@ interface AdminCrudPageProps {
   hideCreate?: boolean;
   hideEdit?: boolean;
   hideDelete?: boolean;
+  // Extra element to render next to search bar
+  filterButton?: React.ReactNode;
 }
 
 // ─── Component ───────────────────────────────────────────
@@ -70,6 +72,7 @@ export function AdminCrudPage({
   hideCreate = false,
   hideEdit = false,
   hideDelete = false,
+  filterButton,
 }: AdminCrudPageProps) {
   const [data, setData] = useState<Record<string, any>[]>(initialData);
   const [search, setSearch] = useState("");
@@ -225,15 +228,18 @@ export function AdminCrudPage({
         )}
 
         {/* Search */}
-        <div className="mb-5 relative max-w-sm">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search records..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-xl border border-input bg-card pl-10 pr-3 py-2.5 text-sm shadow-soft placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
-          />
+        <div className="mb-5 flex items-center gap-2">
+          <div className="relative max-w-sm flex-1">
+            <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search records..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full rounded-xl border border-input bg-card pl-10 pr-3 py-2.5 text-sm shadow-soft placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-shadow"
+            />
+          </div>
+          {filterButton}
         </div>
 
         {/* Table */}

@@ -226,49 +226,45 @@ function EventsPage() {
   };
 
   return (
-    <div className="space-y-0">
-      <div className="border-b border-border bg-card/70 backdrop-blur px-8 py-6 sticky top-0 z-10">
-        <h1 className="text-2xl font-extrabold tracking-tight">Events</h1>
-      </div>
-
-      <div className="relative">
-        <button
-          onClick={() => setShowFilterDrawer(true)}
-          className="absolute -top-12 right-0 p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors z-20"
-          title="Filters"
-        >
-          <Filter size={20} />
-        </button>
-
-        <AdminCrudPage
-          key={filterKey}
-          title="Events"
-          subtitle="Review and manage all platform events"
-          columns={columns}
-          initialData={data}
-          hideCreate
-          hideEdit
-          hideDelete
-          apiFns={{
-            list: async () => {
-              const result = await listFn({
-                data: {
-                  page: 1,
-                  limit: 20,
-                  status: filters.status || undefined,
-                  format: filters.format || undefined,
-                  categoryId: filters.categoryId || undefined,
-                  organizerId: filters.organizerId || undefined,
-                },
-              });
-              return Array.isArray(result) ? result : [];
-            },
-          }}
-          rowActions={(row, refresh) => (
-            <EventActions row={row} token={token} onRefresh={refresh} />
-          )}
-        />
-      </div>
+    <div>
+      <AdminCrudPage
+        key={filterKey}
+        title="Events"
+        subtitle="Review and manage all platform events"
+        columns={columns}
+        initialData={data}
+        hideCreate
+        hideEdit
+        hideDelete
+        apiFns={{
+          list: async () => {
+            const result = await listFn({
+              data: {
+                page: 1,
+                limit: 20,
+                status: filters.status || undefined,
+                format: filters.format || undefined,
+                categoryId: filters.categoryId || undefined,
+                organizerId: filters.organizerId || undefined,
+              },
+            });
+            return Array.isArray(result) ? result : [];
+          },
+        }}
+        rowActions={(row, refresh) => (
+          <EventActions row={row} token={token} onRefresh={refresh} />
+        )}
+        filterButton={
+          <button
+            onClick={() => setShowFilterDrawer(true)}
+            className="flex items-center gap-2 rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-muted-foreground shadow-soft hover:text-foreground hover:bg-accent transition-colors"
+            title="Filters"
+          >
+            <Filter size={16} />
+            <span className="font-medium">Filters</span>
+          </button>
+        }
+      />
 
       {/* Filter Drawer */}
       {showFilterDrawer && (
