@@ -225,15 +225,17 @@ function EventsPage() {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight">Events</h1>
-        <p className="text-sm text-muted-foreground mt-1">Review and manage all platform events</p>
+    <div className="space-y-0">
+      <div className="border-b border-border bg-card/70 backdrop-blur px-8 py-6 sticky top-0 z-10">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+          Review and manage all platform events
+        </p>
+        <h1 className="mt-1 text-2xl font-extrabold tracking-tight">Events</h1>
       </div>
 
-      <div className="bg-card rounded-lg border border-border/40 p-6 shadow-sm">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="lg:col-span-2">
+      <div className="p-8">
+        <div className="flex flex-col sm:flex-row sm:items-end gap-4">
+          <div className="flex-1">
             <label className="block text-xs font-semibold mb-2 uppercase tracking-wide text-foreground/80">
               Status
             </label>
@@ -251,7 +253,7 @@ function EventsPage() {
             </select>
           </div>
 
-          <div>
+          <div className="flex-1">
             <label className="block text-xs font-semibold mb-2 uppercase tracking-wide text-foreground/80">
               Format
             </label>
@@ -269,7 +271,7 @@ function EventsPage() {
             </select>
           </div>
 
-          <div>
+          <div className="flex-1">
             <label className="block text-xs font-semibold mb-2 uppercase tracking-wide text-foreground/80">
               Category
             </label>
@@ -288,7 +290,7 @@ function EventsPage() {
             </select>
           </div>
 
-          <div>
+          <div className="flex-1">
             <label className="block text-xs font-semibold mb-2 uppercase tracking-wide text-foreground/80">
               Organizer
             </label>
@@ -306,21 +308,21 @@ function EventsPage() {
               ))}
             </select>
           </div>
-        </div>
 
-        <div className="flex gap-2 mt-6 pt-4 border-t border-border/40">
-          <button
-            onClick={applyFilters}
-            className="px-5 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:bg-primary/90 active:scale-95 transition-all duration-200"
-          >
-            Apply Filters
-          </button>
-          <button
-            onClick={clearFilters}
-            className="px-5 py-2.5 border border-input bg-background rounded-lg text-sm font-semibold text-foreground hover:bg-accent/50 active:scale-95 transition-all duration-200"
-          >
-            Clear Filters
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={applyFilters}
+              className="px-5 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:bg-primary/90 active:scale-95 transition-all duration-200 whitespace-nowrap"
+            >
+              Apply
+            </button>
+            <button
+              onClick={clearFilters}
+              className="px-5 py-2.5 border border-input bg-background rounded-lg text-sm font-semibold text-foreground hover:bg-accent/50 active:scale-95 transition-all duration-200 whitespace-nowrap"
+            >
+              Clear
+            </button>
+          </div>
         </div>
       </div>
 
