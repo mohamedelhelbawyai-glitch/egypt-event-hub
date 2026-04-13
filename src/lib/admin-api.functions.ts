@@ -74,9 +74,9 @@ export const listEventsAdmin = createServerFn({ method: "GET" })
     const token = requireAdminToken();
     const result = await eventsApi.listAdmin(data.page ?? 1, data.limit ?? 100, token);
 
-    // Backend returns paginated response: { rows: [...] or data: [...], total: X, page: X, limit: X }
-    const resultObj = Array.isArray(result) ? { rows: result } : result;
-    return (resultObj as any)?.rows || (resultObj as any)?.data || [];
+    // Backend returns paginated response: { data: [...], total: X, page: X, limit: X }
+    const resultObj = Array.isArray(result) ? { data: result } : result;
+    return (resultObj as any)?.data || [];
   });
 
 export const createEventAdmin = createServerFn({ method: "POST" })

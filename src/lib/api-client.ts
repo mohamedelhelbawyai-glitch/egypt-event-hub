@@ -665,19 +665,19 @@ export const eventsApi = {
 
   // Admin
   listAdmin: async (page = 1, limit = 20, token: string) => {
-    const response = await request<{ success: boolean; data: { rows: any[]; total: number; page: number; limit: number } }>(
+    const response = await request<{ success: boolean; data: { data: any[]; total: number; page: number; limit: number } }>(
       `/admin/events?page=${page}&limit=${limit}`,
       { token }
     );
-    return response.data || { rows: [] };
+    return response.data || { data: [] };
   },
 
   listPendingAdmin: async (page = 1, limit = 20, token: string) => {
-    const response = await request<{ success: boolean; data: { rows: any[]; total: number; page: number; limit: number } }>(
+    const response = await request<{ success: boolean; data: { data: any[]; total: number; page: number; limit: number } }>(
       `/admin/events/pending?page=${page}&limit=${limit}`,
       { token }
     );
-    return response.data || { rows: [] };
+    return response.data || { data: [] };
   },
 
   getAdmin: (id: string, token: string) =>
