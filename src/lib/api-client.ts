@@ -221,18 +221,25 @@ export const usersApi = {
 export interface OrganizerProfile {
   id: string;
   userId: string;
-  name: string;
-  description?: string;
-  logo?: string;
-  website?: string;
-  phone?: string;
-  email: string;
-  status: "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED";
+  displayNameAr: string;
+  displayNameEn: string;
+  bioAr?: string;
+  bioEn?: string;
+  logoUrl?: string | null;
+  bannerUrl?: string | null;
+  type: "INDIVIDUAL" | "COMPANY";
   trustTier: number;
   verifiedBadge: boolean;
-  followersCount: number;
-  eventsCount: number;
+  commercialRegNo?: string | null;
+  taxId?: string | null;
+  bankAccountEnc?: string | null;
+  approvedById?: string | null;
+  status: "PENDING" | "APPROVED" | "REJECTED" | "SUSPENDED" | "ACTIVE";
+  socialLinks?: Record<string, string> | null;
+  user?: UserProfile;
+  approvedBy?: any;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateOrganizerRequest {

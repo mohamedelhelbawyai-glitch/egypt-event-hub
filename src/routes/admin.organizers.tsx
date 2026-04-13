@@ -21,9 +21,12 @@ export const Route = createFileRoute("/admin/organizers")({
 });
 
 const columns: ColumnDef[] = [
-  { key: "name", label: "Name" },
-  { key: "email", label: "Email" },
-  { key: "eventsCount", label: "Events" },
+  { key: "displayNameEn", label: "Name" },
+  {
+    key: "user.email",
+    label: "Email",
+    render: (v, row: any) => row?.user?.email || "—",
+  },
   { key: "trustTier", label: "Trust Tier" },
   { key: "status", label: "Status", render: (v) => <ApiStatusBadge status={v} /> },
 ];
