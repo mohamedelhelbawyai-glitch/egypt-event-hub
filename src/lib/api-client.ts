@@ -626,6 +626,25 @@ export interface UpdateTicketTypeRequest {
   quantity?: number;
 }
 
+export interface EventsListFilters {
+  status?: string;
+  format?: string;
+  categoryId?: string;
+  organizerId?: string;
+}
+
+function buildEventsQuery(page: number, limit: number, filters?: EventsListFilters) {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  if (filters?.status) params.set("status", filters.status);
+  if (filters?.format) params.set("format", filters.format);
+  if (filters?.categoryId) params.set("categoryId", filters.categoryId);
+  if (filters?.organizerId) params.set("organizerId", filters.organizerId);
+  return params.toString();
+}
+
 export const eventsApi = {
   listCategories: () =>
     request<Category[]>("/events/categories"),
@@ -687,9 +706,9 @@ export const eventsApi = {
     request<Event>(`/events/${id}`),
 
   // Admin
-  listAdmin: async (page = 1, limit = 20, token: string) => {
+  listAdmin: async (page = 1, limit = 20, token: string, filters?: EventsListFilters) => {
     const response = await request<{ success: boolean; data: { data: any[]; total: number; page: number; limit: number } }>(
-      `/admin/events?page=${page}&limit=${limit}`,
+      `/admin/events?${buildEventsQuery(page, limit, filters)}`,
       { token }
     );
     return response.data || { data: [] };

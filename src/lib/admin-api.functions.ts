@@ -68,11 +68,20 @@ export const listEventsAdmin = createServerFn({ method: "GET" })
       page: z.number().min(1).optional(),
       limit: z.number().min(1).max(100).optional(),
       search: z.string().optional(),
+      status: z.string().optional(),
+      format: z.string().optional(),
+      categoryId: z.string().optional(),
+      organizerId: z.string().optional(),
     })
   )
   .handler(async ({ data }) => {
     const token = requireAdminToken();
-    const result = await eventsApi.listAdmin(data.page ?? 1, data.limit ?? 20, token);
+    const result = await eventsApi.listAdmin(data.page ?? 1, data.limit ?? 20, token, {
+      status: data.status,
+      format: data.format,
+      categoryId: data.categoryId,
+      organizerId: data.organizerId,
+    });
 
     // Backend returns paginated response: { data: [...], total: X, page: X, limit: X }
     const resultObj = Array.isArray(result) ? { data: result } : result;

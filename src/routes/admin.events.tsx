@@ -158,25 +158,154 @@ function EventActions({
 function EventsPage() {
   const { data, token } = Route.useLoaderData();
   const listFn = useServerFn(listEventsAdmin);
+  const [filters, setFilters] = useState({
+    status: "",
+    format: "",
+    categoryId: "",
+    organizerId: "",
+  });
+  const [filterKey, setFilterKey] = useState(0);
+
+  const STATUS_OPTIONS = [
+    "DRAFT",
+    "PENDING_REVIEW",
+    "PUBLISHED",
+    "ON_SALE",
+    "SOLD_OUT",
+    "LIVE",
+    "COMPLETED",
+    "CANCELLED",
+  ];
+
+  const FORMAT_OPTIONS = ["GA", "SEATED", "ONLINE", "HYBRID", "FREE"];
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const applyFilters = () => {
+    setFilterKey((prev) => prev + 1);
+  };
+
+  const clearFilters = () => {
+    setFilters({
+      status: "",
+      format: "",
+      categoryId: "",
+      organizerId: "",
+    });
+    setFilterKey((prev) => prev + 1);
+  };
 
   return (
-    <AdminCrudPage
-      title="Events"
-      subtitle="Review and manage all platform events"
-      columns={columns}
-      initialData={data}
-      hideCreate
-      hideEdit
-      hideDelete
-      apiFns={{
-        list: async () => {
-          const result = await listFn({ data: { page: 1, limit: 20 } });
-          return Array.isArray(result) ? result : [];
-        },
-      }}
-      rowActions={(row, refresh) => (
-        <EventActions row={row} token={token} onRefresh={refresh} />
-      )}
-    />
+    <div className="space-y-4">
+      <div>
+        <h1 className="text-2xl font-bold">Events</h1>
+        <p className="text-sm text-muted-foreground">Review and manage all platform events</p>
+      </div>
+
+      <div className="bg-card rounded-lg border p-4 space-y-4">
+        <h3 className="font-semibold text-sm">Filters</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div>
+            <label className="block text-xs font-medium mb-2">Status</label>
+            <select
+              value={filters.status}
+              onChange={(e) => handleFilterChange("status", e.target.value)}
+              className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="">All Status</option>
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium mb-2">Format</label>
+            <select
+              value={filters.format}
+              onChange={(e) => handleFilterChange("format", e.target.value)}
+              className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            >
+              <option value="">All Formats</option>
+              {FORMAT_OPTIONS.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium mb-2">Category ID</label>
+            <input
+              type="text"
+              value={filters.categoryId}
+              onChange={(e) => handleFilterChange("categoryId", e.target.value)}
+              placeholder="e.g., cat-123"
+              className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium mb-2">Organizer ID</label>
+            <input
+              type="text"
+              value={filters.organizerId}
+              onChange={(e) => handleFilterChange("organizerId", e.target.value)}
+              placeholder="e.g., org-123"
+              className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+        </div>
+
+        <div className="flex gap-2">
+          <button
+            onClick={applyFilters}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
+          >
+            Apply Filters
+          </button>
+          <button
+            onClick={clearFilters}
+            className="px-4 py-2 border border-input rounded-md text-sm font-medium hover:bg-accent transition-colors"
+          >
+            Clear Filters
+          </button>
+        </div>
+      </div>
+
+      <AdminCrudPage
+        key={filterKey}
+        title="Events"
+        subtitle="Review and manage all platform events"
+        columns={columns}
+        initialData={data}
+        hideCreate
+        hideEdit
+        hideDelete
+        apiFns={{
+          list: async () => {
+            const result = await listFn({
+              data: {
+                page: 1,
+                limit: 20,
+                status: filters.status || undefined,
+                format: filters.format || undefined,
+                categoryId: filters.categoryId || undefined,
+                organizerId: filters.organizerId || undefined,
+              },
+            });
+            return Array.isArray(result) ? result : [];
+          },
+        }}
+        rowActions={(row, refresh) => (
+          <EventActions row={row} token={token} onRefresh={refresh} />
+        )}
+      />
+    </div>
   );
 }
