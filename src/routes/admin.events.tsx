@@ -10,7 +10,7 @@ import { AdminCrudPage, ApiStatusBadge, type ColumnDef } from "@/components/admi
 export const Route = createFileRoute("/admin/events")({
   loader: async () => {
     const [eventsResult, session] = await Promise.all([
-      listEventsAdmin({ data: { page: 1, limit: 100 } }),
+      listEventsAdmin({ data: { page: 1, limit: 20 } }),
       getAdminSession(),
     ]);
     const rows = Array.isArray(eventsResult) ? eventsResult : [];
@@ -129,7 +129,7 @@ function EventsPage() {
       hideDelete
       apiFns={{
         list: async () => {
-          const result = await listFn({ data: { page: 1, limit: 100 } });
+          const result = await listFn({ data: { page: 1, limit: 20 } });
           return Array.isArray(result) ? result : [];
         },
       }}

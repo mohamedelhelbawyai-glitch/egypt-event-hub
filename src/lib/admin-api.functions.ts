@@ -72,7 +72,7 @@ export const listEventsAdmin = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const token = requireAdminToken();
-    const result = await eventsApi.listAdmin(data.page ?? 1, data.limit ?? 100, token);
+    const result = await eventsApi.listAdmin(data.page ?? 1, data.limit ?? 20, token);
 
     // Backend returns paginated response: { data: [...], total: X, page: X, limit: X }
     const resultObj = Array.isArray(result) ? { data: result } : result;
@@ -290,7 +290,7 @@ export const listOrganizersAdmin = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const token = requireAdminToken();
-    const result = await organizersApi.listAdmin(data.page ?? 1, data.limit ?? 100, token);
+    const result = await organizersApi.listAdmin(data.page ?? 1, data.limit ?? 20, token);
 
     // Backend returns paginated response: { rows: [...] or data: [...], total: X, page: X, limit: X }
     const resultObj = Array.isArray(result) ? { rows: result } : result;
@@ -333,7 +333,7 @@ export const listUsersAdmin = createServerFn({ method: "GET" })
   )
   .handler(async ({ data }) => {
     const token = requireAdminToken();
-    const result = await usersApi.listAdmin(data.page ?? 1, data.limit ?? 100, token);
+    const result = await usersApi.listAdmin(data.page ?? 1, data.limit ?? 20, token);
 
     // Backend returns paginated response: { data: [...], total: X, page: X, limit: X }
     const resultObj = Array.isArray(result) ? { data: result } : result;

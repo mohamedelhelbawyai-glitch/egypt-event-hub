@@ -11,7 +11,7 @@ const API_BASE = "https://tazkara-backend-production.up.railway.app/api/v1";
 export const Route = createFileRoute("/admin/users")({
   loader: async () => {
     const [result, session] = await Promise.all([
-      listUsersAdmin({ data: { page: 1, limit: 100 } }),
+      listUsersAdmin({ data: { page: 1, limit: 20 } }),
       getAdminSession(),
     ]);
     const rows = Array.isArray(result) ? result : [];
@@ -118,7 +118,7 @@ function UsersPage() {
       hideDelete
       apiFns={{
         list: async () => {
-          const result = await listFn({ data: { page: 1, limit: 100 } });
+          const result = await listFn({ data: { page: 1, limit: 20 } });
           return Array.isArray(result) ? result : [];
         },
       }}
