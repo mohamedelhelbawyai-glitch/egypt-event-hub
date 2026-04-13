@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { Search, Plus, Pencil, Trash2, Loader2 } from "lucide-react";
 import {
@@ -90,6 +90,12 @@ export function AdminCrudPage({
   const toggleFn = useServerFn(toggleField);
 
   const isApiMode = !!apiFns;
+
+  useEffect(() => {
+    if (isApiMode && apiFns?.list) {
+      apiFns.list().then(setData).catch(() => {});
+    }
+  }, []);
 
   const refresh = async () => {
     try {
