@@ -169,9 +169,22 @@ export const listVenuesAdmin = createServerFn({ method: "GET" })
       type: data.type,
     };
     const result = await venuesApi.listAdmin(data.page ?? 1, data.limit ?? 20, token, filters);
+
+    // Handle both array and paginated object responses
+    let rows: any[] = [];
+    let total = 0;
+
+    if (Array.isArray(result)) {
+      rows = result;
+      total = result.length;
+    } else if (result && typeof result === 'object') {
+      rows = (result as any).rows || (result as any).data || [];
+      total = (result as any).total || rows.length;
+    }
+
     return {
-      rows: Array.isArray(result) ? result : [],
-      total: (result as any)?.total ?? result.length ?? 0,
+      rows,
+      total,
       page: data.page ?? 1,
       limit: data.limit ?? 20,
     } as any;
