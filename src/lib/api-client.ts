@@ -266,19 +266,19 @@ export const organizersApi = {
 
   // Admin
   listAdmin: async (page = 1, limit = 20, token: string) => {
-    const response = await request<{ success: boolean; data: { rows: OrganizerProfile[]; total: number; page: number; limit: number } }>(
+    const response = await request<{ success: boolean; data: { data: OrganizerProfile[]; total: number; page: number; limit: number } }>(
       `/admin/organizers?page=${page}&limit=${limit}`,
       { token }
     );
-    return response.data || { rows: [] };
+    return response.data || { data: [] };
   },
 
   listPendingAdmin: async (token: string, page = 1, limit = 20) => {
-    const response = await request<{ success: boolean; data: { rows: OrganizerProfile[]; total: number; page: number; limit: number } }>(
+    const response = await request<{ success: boolean; data: { data: OrganizerProfile[]; total: number; page: number; limit: number } }>(
       `/admin/organizers/pending?page=${page}&limit=${limit}`,
       { token }
     );
-    return response.data || { rows: [] };
+    return response.data || { data: [] };
   },
 
   getAdmin: (id: string, token: string) =>
