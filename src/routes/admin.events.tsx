@@ -166,7 +166,7 @@ function EventsPage() {
   });
   const [filterKey, setFilterKey] = useState(0);
   const [categories, setCategories] = useState<Array<{ id: string; nameEn: string }>>([]);
-  const [organizers, setOrganizers] = useState<Array<{ id: string; displayNameEn: string }>>([]);
+  const [organizers, setOrganizers] = useState<Array<{ id: string; displayNameEn: string; status?: string }>>([]);
   const [loading, setLoading] = useState(true);
 
   const STATUS_OPTIONS = [
@@ -226,20 +226,21 @@ function EventsPage() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-2xl font-bold">Events</h1>
-        <p className="text-sm text-muted-foreground">Review and manage all platform events</p>
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight">Events</h1>
+        <p className="text-sm text-muted-foreground mt-1">Review and manage all platform events</p>
       </div>
 
-      <div className="bg-card rounded-lg border p-4 space-y-4">
-        <h3 className="font-semibold text-sm">Filters</h3>
+      <div className="bg-card rounded-lg border border-border/40 p-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div>
-            <label className="block text-xs font-medium mb-2">Status</label>
+          <div className="lg:col-span-2">
+            <label className="block text-xs font-semibold mb-2 uppercase tracking-wide text-foreground/80">
+              Status
+            </label>
             <select
               value={filters.status}
               onChange={(e) => handleFilterChange("status", e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full px-3 py-2.5 border border-input rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background transition-all"
             >
               <option value="">All Status</option>
               {STATUS_OPTIONS.map((option) => (
@@ -251,11 +252,13 @@ function EventsPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium mb-2">Format</label>
+            <label className="block text-xs font-semibold mb-2 uppercase tracking-wide text-foreground/80">
+              Format
+            </label>
             <select
               value={filters.format}
               onChange={(e) => handleFilterChange("format", e.target.value)}
-              className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full px-3 py-2.5 border border-input rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background transition-all"
             >
               <option value="">All Formats</option>
               {FORMAT_OPTIONS.map((option) => (
@@ -267,12 +270,14 @@ function EventsPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium mb-2">Category</label>
+            <label className="block text-xs font-semibold mb-2 uppercase tracking-wide text-foreground/80">
+              Category
+            </label>
             <select
               value={filters.categoryId}
               onChange={(e) => handleFilterChange("categoryId", e.target.value)}
               disabled={loading}
-              className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+              className="w-full px-3 py-2.5 border border-input rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               <option value="">All Categories</option>
               {categories.map((cat) => (
@@ -284,15 +289,17 @@ function EventsPage() {
           </div>
 
           <div>
-            <label className="block text-xs font-medium mb-2">Organizer</label>
+            <label className="block text-xs font-semibold mb-2 uppercase tracking-wide text-foreground/80">
+              Organizer
+            </label>
             <select
               value={filters.organizerId}
               onChange={(e) => handleFilterChange("organizerId", e.target.value)}
               disabled={loading}
-              className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+              className="w-full px-3 py-2.5 border border-input rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
               <option value="">All Organizers</option>
-              {organizers.map((org) => (
+              {organizers.filter((org) => org.status !== "REJECTED").map((org) => (
                 <option key={org.id} value={org.id}>
                   {org.displayNameEn}
                 </option>
@@ -301,16 +308,16 @@ function EventsPage() {
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 mt-6 pt-4 border-t border-border/40">
           <button
             onClick={applyFilters}
-            className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90 transition-colors"
+            className="px-5 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-semibold hover:bg-primary/90 active:scale-95 transition-all duration-200"
           >
             Apply Filters
           </button>
           <button
             onClick={clearFilters}
-            className="px-4 py-2 border border-input rounded-md text-sm font-medium hover:bg-accent transition-colors"
+            className="px-5 py-2.5 border border-input bg-background rounded-lg text-sm font-semibold text-foreground hover:bg-accent/50 active:scale-95 transition-all duration-200"
           >
             Clear Filters
           </button>
