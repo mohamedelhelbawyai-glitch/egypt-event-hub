@@ -3,7 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { listEventsAdmin } from "@/lib/admin-api.functions";
-import { adminApi } from "@/lib/api-client";
+import { adminApi, eventsApi } from "@/lib/api-client";
 import { getAdminSession } from "@/lib/admin-auth.functions";
 import { AdminCrudPage, ApiStatusBadge, type ColumnDef } from "@/components/admin/AdminCrudPage";
 
@@ -60,15 +60,15 @@ function EventActions({
   const approve = async () => {
     setLoading("approve");
     try {
-      await adminApi.getDashboardStats(token); // warm token
-      // Direct API call for approve
-      await fetch(
-        `https://tazkara-backend-production.up.railway.app/api/v1/admin/events/${row.id}/approve`,
-        { method: "POST", headers: { Authorization: `Bearer ${token}` } }
-      );
+      await eventsApi.approveAdmin(row.id, token);
       await onRefresh();
-    } catch {}
-    setLoading(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to approve event";
+      alert(`Error: ${message}`);
+      console.error("Approve event error:", error);
+    } finally {
+      setLoading(null);
+    }
   };
 
   const reject = async () => {
@@ -76,20 +76,15 @@ function EventActions({
     if (!reason) return;
     setLoading("reject");
     try {
-      await fetch(
-        `https://tazkara-backend-production.up.railway.app/api/v1/admin/events/${row.id}/reject`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ reason }),
-        }
-      );
+      await eventsApi.rejectAdmin(row.id, reason, token);
       await onRefresh();
-    } catch {}
-    setLoading(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to reject event";
+      alert(`Error: ${message}`);
+      console.error("Reject event error:", error);
+    } finally {
+      setLoading(null);
+    }
   };
 
   return (
