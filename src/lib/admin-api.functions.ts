@@ -163,12 +163,12 @@ export const listVenuesAdmin = createServerFn({ method: "GET" })
     })
   )
   .handler(async ({ data }) => {
+    const token = requireAdminToken();
     const filters: VenueListFilters = {
       governorateId: data.governorateId,
       type: data.type,
     };
-    // Use public venues endpoint for now - /admin/venues endpoint not yet available
-    const result = await venuesApi.listPublicVenues(data.page ?? 1, data.limit ?? 20, filters);
+    const result = await venuesApi.listAdmin(data.page ?? 1, data.limit ?? 20, token, filters);
 
     // Handle both array and paginated object responses
     let rows: any[] = [];
