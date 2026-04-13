@@ -148,12 +148,16 @@ export interface UserProfile {
   id: string;
   phone: string;
   email?: string;
-  firstName?: string;
-  lastName?: string;
-  avatar?: string;
+  nameAr?: string;
+  nameEn?: string;
+  avatarUrl?: string;
   status: "ACTIVE" | "SUSPENDED" | "BANNED";
   loyaltyPoints: number;
+  referralCode?: string;
+  locale?: string;
+  phoneVerifiedAt?: string;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface UpdateProfileRequest {

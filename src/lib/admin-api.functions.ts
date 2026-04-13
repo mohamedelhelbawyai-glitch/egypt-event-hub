@@ -73,7 +73,10 @@ export const listEventsAdmin = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const token = requireAdminToken();
     const result = await eventsApi.listAdmin(data.page ?? 1, data.limit ?? 100, token);
-    return Array.isArray(result) ? result : [];
+
+    // Backend returns paginated response: { rows: [...] or data: [...], total: X, page: X, limit: X }
+    const resultObj = Array.isArray(result) ? { rows: result } : result;
+    return (resultObj as any)?.rows || (resultObj as any)?.data || [];
   });
 
 export const createEventAdmin = createServerFn({ method: "POST" })
@@ -170,23 +173,16 @@ export const listVenuesAdmin = createServerFn({ method: "GET" })
     };
     const result = await venuesApi.listAdmin(data.page ?? 1, data.limit ?? 20, token, filters);
 
-    // Handle both array and paginated object responses
-    let rows: any[] = [];
-    let total = 0;
-
-    if (Array.isArray(result)) {
-      rows = result;
-      total = result.length;
-    } else if (result && typeof result === 'object') {
-      rows = (result as any).rows || (result as any).data || [];
-      total = (result as any).total || rows.length;
-    }
+    // Backend returns paginated response: { rows: [...], total: X, page: X, limit: X }
+    const resultObj = Array.isArray(result) ? { rows: result } : result;
+    const rows = (resultObj as any)?.rows || [];
+    const total = (resultObj as any)?.total || rows.length;
 
     return {
       rows,
       total,
-      page: data.page ?? 1,
-      limit: data.limit ?? 20,
+      page: (resultObj as any)?.page ?? data.page ?? 1,
+      limit: (resultObj as any)?.limit ?? data.limit ?? 20,
     } as any;
   });
 
@@ -295,7 +291,10 @@ export const listOrganizersAdmin = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const token = requireAdminToken();
     const result = await organizersApi.listAdmin(data.page ?? 1, data.limit ?? 100, token);
-    return Array.isArray(result) ? result : [];
+
+    // Backend returns paginated response: { rows: [...] or data: [...], total: X, page: X, limit: X }
+    const resultObj = Array.isArray(result) ? { rows: result } : result;
+    return (resultObj as any)?.rows || (resultObj as any)?.data || [];
   });
 
 export const updateOrganizerAdmin = createServerFn({ method: "POST" })
@@ -335,7 +334,10 @@ export const listUsersAdmin = createServerFn({ method: "GET" })
   .handler(async ({ data }) => {
     const token = requireAdminToken();
     const result = await usersApi.listAdmin(data.page ?? 1, data.limit ?? 100, token);
-    return Array.isArray(result) ? result : [];
+
+    // Backend returns paginated response: { data: [...], total: X, page: X, limit: X }
+    const resultObj = Array.isArray(result) ? { data: result } : result;
+    return (resultObj as any)?.data || (resultObj as any)?.rows || [];
   });
 
 export const updateUserAdmin = createServerFn({ method: "POST" })
@@ -526,9 +528,11 @@ export const listOrdersAdmin = createServerFn({ method: "GET" })
 
     try {
       const result = await ordersApi.listAdmin(page, limit, token, filters);
+      // Backend returns paginated response: { rows: [...] or data: [...], total: X, page: X, limit: X }
       const listResult = Array.isArray(result) ? { rows: result } : result;
+      const rows = (listResult as any)?.rows || (listResult as any)?.data || [];
       return {
-        ...normalizeOrdersListResponse(listResult, { page, limit }),
+        ...normalizeOrdersListResponse({ rows, ...(listResult as any) }, { page, limit }),
         backendGap: false,
       };
     } catch (error) {

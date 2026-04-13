@@ -22,9 +22,9 @@ export const Route = createFileRoute("/admin/users")({
 
 const columns: ColumnDef[] = [
   {
-    key: "firstName",
+    key: "nameEn",
     label: "Name",
-    render: (v, row) => `${row.firstName ?? ""} ${row.lastName ?? ""}`.trim() || "—",
+    render: (v, row) => `${row.nameEn ?? ""} ${row.nameAr ?? ""}`.trim() || row.phone || "—",
   },
   { key: "phone", label: "Phone" },
   { key: "email", label: "Email", render: (v) => v || "—" },
