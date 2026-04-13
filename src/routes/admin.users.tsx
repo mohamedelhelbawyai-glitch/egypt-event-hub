@@ -2,6 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { ShieldOff, ShieldAlert, RefreshCw, Loader2 } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { listUsersAdmin } from "@/lib/admin-api.functions";
 import { getAdminSession } from "@/lib/admin-auth.functions";
 import { AdminCrudPage, ApiStatusBadge, type ColumnDef } from "@/components/admin/AdminCrudPage";
@@ -41,7 +51,11 @@ function UserActions({
   token: string;
   onRefresh: () => Promise<void>;
 }) {
-  const [loading, setLoading] = useState<string | null>(null);
+  const [loading, setLoading] = useState<"suspend" | "ban" | "reactivate" | null>(null);
+  const [showSuspendDialog, setShowSuspendDialog] = useState(false);
+  const [suspendReason, setSuspendReason] = useState("");
+  const [showBanDialog, setShowBanDialog] = useState(false);
+  const [banReason, setBanReason] = useState("");
 
   const callApi = async (path: string, body?: object) => {
     await fetch(`${API_BASE}${path}`, {
@@ -55,19 +69,35 @@ function UserActions({
     await onRefresh();
   };
 
-  const suspend = async () => {
-    const reason = prompt("Suspension reason:");
-    if (!reason) return;
+  const handleSuspendClick = () => {
+    setShowSuspendDialog(true);
+    setSuspendReason("");
+  };
+
+  const confirmSuspend = async () => {
+    if (!suspendReason.trim()) {
+      alert("Please provide a suspension reason");
+      return;
+    }
+    setShowSuspendDialog(false);
     setLoading("suspend");
-    try { await callApi(`/admin/users/${row.id}/suspend`, { reason }); } catch {}
+    try { await callApi(`/admin/users/${row.id}/suspend`, { reason: suspendReason }); } catch {}
     setLoading(null);
   };
 
-  const ban = async () => {
-    const reason = prompt("Ban reason:");
-    if (!reason) return;
+  const handleBanClick = () => {
+    setShowBanDialog(true);
+    setBanReason("");
+  };
+
+  const confirmBan = async () => {
+    if (!banReason.trim()) {
+      alert("Please provide a ban reason");
+      return;
+    }
+    setShowBanDialog(false);
     setLoading("ban");
-    try { await callApi(`/admin/users/${row.id}/ban`, { reason }); } catch {}
+    try { await callApi(`/admin/users/${row.id}/ban`, { reason: banReason }); } catch {}
     setLoading(null);
   };
 
@@ -83,11 +113,11 @@ function UserActions({
     <>
       {status === "ACTIVE" && (
         <>
-          <button onClick={suspend} disabled={!!loading} title="Suspend"
+          <button onClick={handleSuspendClick} disabled={!!loading} title="Suspend"
             className="rounded-lg p-2 text-muted-foreground hover:bg-orange-100 hover:text-orange-600 transition-colors">
             {loading === "suspend" ? <Loader2 size={14} className="animate-spin" /> : <ShieldOff size={14} />}
           </button>
-          <button onClick={ban} disabled={!!loading} title="Ban"
+          <button onClick={handleBanClick} disabled={!!loading} title="Ban"
             className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors">
             {loading === "ban" ? <Loader2 size={14} className="animate-spin" /> : <ShieldAlert size={14} />}
           </button>
@@ -99,6 +129,58 @@ function UserActions({
           {loading === "reactivate" ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
         </button>
       )}
+
+      <AlertDialog open={showSuspendDialog} onOpenChange={setShowSuspendDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Suspend User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Please provide a reason for suspending this user.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <textarea
+              value={suspendReason}
+              onChange={(e) => setSuspendReason(e.target.value)}
+              placeholder="Enter suspension reason..."
+              className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              rows={4}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmSuspend} className="bg-orange-600 hover:bg-orange-700">
+              Suspend User
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showBanDialog} onOpenChange={setShowBanDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Ban User</AlertDialogTitle>
+            <AlertDialogDescription>
+              Please provide a reason for banning this user.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <textarea
+              value={banReason}
+              onChange={(e) => setBanReason(e.target.value)}
+              placeholder="Enter ban reason..."
+              className="w-full px-3 py-2 border border-input rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+              rows={4}
+            />
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmBan} className="bg-destructive hover:bg-destructive/90">
+              Ban User
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
