@@ -534,15 +534,26 @@ export interface TicketType {
 export interface Event {
   id: string;
   organizerId: string;
-  venueId?: string;
-  name: string;
-  description?: string;
+  venueId?: string | null;
   categoryId: string;
-  format: "ONLINE" | "HYBRID" | "PHYSICAL";
+  audienceRestrictionId?: string | null;
+  refundPolicyId?: string | null;
+  approvedByAdminId?: string | null;
+  titleAr: string;
+  titleEn: string;
+  descriptionAr?: string;
+  descriptionEn?: string;
+  format: string; // "SEATED", "GA", "STANDING", etc. (not ONLINE/HYBRID/PHYSICAL)
+  coverImageUrl?: string;
+  galleryUrls?: string[];
+  streamUrl?: string | null;
+  seatsioEventKey?: string | null;
   startsAt: string;
   endsAt: string;
-  governorateId?: string;
-  image?: string;
+  doorsOpenAt?: string;
+  visibility?: string;
+  privateInviteToken?: string | null;
+  customRefundPolicy?: string | null;
   status:
     | "DRAFT"
     | "PENDING_REVIEW"
@@ -552,9 +563,14 @@ export interface Event {
     | "LIVE"
     | "COMPLETED"
     | "CANCELLED";
-  tagIds?: string[];
+  cancellationReason?: string | null;
   ticketTypes?: TicketType[];
+  organizer?: OrganizerProfile;
+  category?: Category;
+  venue?: Venue | null;
+  tags?: Tag[];
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateEventRequest {

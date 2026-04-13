@@ -20,7 +20,7 @@ export const Route = createFileRoute("/admin/events")({
 });
 
 const columns: ColumnDef[] = [
-  { key: "name", label: "Title" },
+  { key: "titleEn", label: "Title" },
   {
     key: "format",
     label: "Format",
