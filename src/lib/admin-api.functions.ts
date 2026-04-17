@@ -16,6 +16,14 @@ import {
   categoriesApi,
   tagsApi,
   paymentMethodsApi,
+  bannersApi,
+  feeRulesApi,
+  refundPoliciesApi,
+  loyaltyRulesApi,
+  featureFlagsApi,
+  audienceRulesApi,
+  ticketTemplatesApi,
+  facilitiesApi,
   ordersApi,
 } from "@/lib/api-client";
 import { normalizeOrderDetails, normalizeOrdersListResponse } from "@/lib/orders-admin";
@@ -605,3 +613,243 @@ export const refundOrderAdmin = createServerFn({ method: "POST" })
   });
 
 
+
+// ─── Banners ─────────────────────────────────────────────
+
+export const listBannersAdmin = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const token = requireAdminToken();
+    return bannersApi.listAdmin(token);
+  });
+
+export const createBannerAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.record(z.string(), z.unknown()))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return bannersApi.createAdmin(data, token);
+  });
+
+export const updateBannerAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string(), updates: z.record(z.string(), z.unknown()) }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return bannersApi.updateAdmin(data.id, data.updates, token);
+  });
+
+export const deleteBannerAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await bannersApi.deleteAdmin(data.id, token);
+    return { success: true };
+  });
+
+// ─── Fee Rules ───────────────────────────────────────────
+
+export const listFeeRulesAdmin = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const token = requireAdminToken();
+    return feeRulesApi.listAdmin(token);
+  });
+
+export const createFeeRuleAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.record(z.string(), z.unknown()))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return feeRulesApi.createAdmin(data, token);
+  });
+
+export const updateFeeRuleAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string(), updates: z.record(z.string(), z.unknown()) }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return feeRulesApi.updateAdmin(data.id, data.updates, token);
+  });
+
+export const deleteFeeRuleAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await feeRulesApi.deleteAdmin(data.id, token);
+    return { success: true };
+  });
+
+// ─── Refund Policies ─────────────────────────────────────
+
+export const listRefundPoliciesAdmin = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const token = requireAdminToken();
+    return refundPoliciesApi.listAdmin(token);
+  });
+
+export const createRefundPolicyAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.record(z.string(), z.unknown()))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return refundPoliciesApi.createAdmin(data, token);
+  });
+
+export const updateRefundPolicyAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string(), updates: z.record(z.string(), z.unknown()) }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return refundPoliciesApi.updateAdmin(data.id, data.updates, token);
+  });
+
+export const deleteRefundPolicyAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await refundPoliciesApi.deleteAdmin(data.id, token);
+    return { success: true };
+  });
+
+// ─── Loyalty Rules ───────────────────────────────────────
+
+export const listLoyaltyRulesAdmin = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const token = requireAdminToken();
+    return loyaltyRulesApi.listAdmin(token);
+  });
+
+export const createLoyaltyRuleAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.record(z.string(), z.unknown()))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return loyaltyRulesApi.createAdmin(data, token);
+  });
+
+export const updateLoyaltyRuleAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string(), updates: z.record(z.string(), z.unknown()) }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return loyaltyRulesApi.updateAdmin(data.id, data.updates, token);
+  });
+
+export const deleteLoyaltyRuleAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await loyaltyRulesApi.deleteAdmin(data.id, token);
+    return { success: true };
+  });
+
+// ─── Feature Flags ───────────────────────────────────────
+
+export const listFeatureFlagsAdmin = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const token = requireAdminToken();
+    return featureFlagsApi.listAdmin(token);
+  });
+
+export const createFeatureFlagAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.record(z.string(), z.unknown()))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return featureFlagsApi.createAdmin(data, token);
+  });
+
+export const updateFeatureFlagAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string(), updates: z.record(z.string(), z.unknown()) }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return featureFlagsApi.updateAdmin(data.id, data.updates, token);
+  });
+
+export const deleteFeatureFlagAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await featureFlagsApi.deleteAdmin(data.id, token);
+    return { success: true };
+  });
+
+// ─── Audience Rules ──────────────────────────────────────
+
+export const listAudienceRulesAdmin = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const token = requireAdminToken();
+    return audienceRulesApi.listAdmin(token);
+  });
+
+export const createAudienceRuleAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.record(z.string(), z.unknown()))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return audienceRulesApi.createAdmin(data, token);
+  });
+
+export const updateAudienceRuleAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string(), updates: z.record(z.string(), z.unknown()) }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return audienceRulesApi.updateAdmin(data.id, data.updates, token);
+  });
+
+export const deleteAudienceRuleAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await audienceRulesApi.deleteAdmin(data.id, token);
+    return { success: true };
+  });
+
+// ─── Ticket Templates ────────────────────────────────────
+
+export const listTicketTemplatesAdmin = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const token = requireAdminToken();
+    return ticketTemplatesApi.listAdmin(token);
+  });
+
+export const createTicketTemplateAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.record(z.string(), z.unknown()))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return ticketTemplatesApi.createAdmin(data, token);
+  });
+
+export const updateTicketTemplateAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string(), updates: z.record(z.string(), z.unknown()) }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return ticketTemplatesApi.updateAdmin(data.id, data.updates, token);
+  });
+
+export const deleteTicketTemplateAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await ticketTemplatesApi.deleteAdmin(data.id, token);
+    return { success: true };
+  });
+
+// ─── Facilities (Admin CRUD) ─────────────────────────────
+
+export const listFacilitiesAdminCrud = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const token = requireAdminToken();
+    return facilitiesApi.listAdmin(token);
+  });
+
+export const createFacilityAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.record(z.string(), z.unknown()))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return facilitiesApi.createAdmin(data, token);
+  });
+
+export const updateFacilityAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string(), updates: z.record(z.string(), z.unknown()) }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    return facilitiesApi.updateAdmin(data.id, data.updates, token);
+  });
+
+export const deleteFacilityAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await facilitiesApi.deleteAdmin(data.id, token);
+    return { success: true };
+  });

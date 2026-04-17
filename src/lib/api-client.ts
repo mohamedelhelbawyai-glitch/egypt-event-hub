@@ -936,8 +936,21 @@ export interface PaymentMethod {
   createdAt: string;
 }
 
+// Actual backend shape
+export interface PaymentMethod {
+  id: string;
+  provider: "PAYMOB" | "CARD" | "VODAFONE_CASH" | "FAWRY" | "INSTAPAY";
+  labelEn: string;
+  labelAr: string;
+  iconUrl?: string | null;
+  isActive: boolean;
+  minAmountEgp?: string | null;
+  sortOrder: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const paymentMethodsApi = {
-  // Admin
   listAdmin: async (token: string) => {
     const response = await request<{ success: boolean; data: PaymentMethod[] }>(
       "/admin/payment-methods",
@@ -945,18 +958,223 @@ export const paymentMethodsApi = {
     );
     return response.data || [];
   },
-
-  getAdmin: (id: string, token: string) =>
-    request<PaymentMethod>(`/admin/payment-methods/${id}`, { token }),
-
   createAdmin: (data: any, token: string) =>
     request<PaymentMethod>("/admin/payment-methods", { method: "POST", body: data, token }),
-
   updateAdmin: (id: string, data: any, token: string) =>
     request<PaymentMethod>(`/admin/payment-methods/${id}`, { method: "PATCH", body: data, token }),
-
   deleteAdmin: (id: string, token: string) =>
     request<any>(`/admin/payment-methods/${id}`, { method: "DELETE", token }),
+};
+
+// ─── Banners ─────────────────────────────────────────────
+
+export interface Banner {
+  id: string;
+  imageUrl: string;
+  linkType: "URL" | "EVENT" | "CATEGORY" | "NONE";
+  linkTarget?: string | null;
+  sortOrder: number;
+  isActive: boolean;
+  startsAt: string;
+  endsAt: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const bannersApi = {
+  listAdmin: async (token: string) => {
+    const res = await request<{ success: boolean; data: Banner[] }>("/admin/banners", { token });
+    return res.data || [];
+  },
+  createAdmin: (data: any, token: string) =>
+    request<Banner>("/admin/banners", { method: "POST", body: data, token }),
+  updateAdmin: (id: string, data: any, token: string) =>
+    request<Banner>(`/admin/banners/${id}`, { method: "PATCH", body: data, token }),
+  deleteAdmin: (id: string, token: string) =>
+    request<void>(`/admin/banners/${id}`, { method: "DELETE", token }),
+};
+
+// ─── Fee Rules ───────────────────────────────────────────
+
+export interface FeeRule {
+  id: string;
+  trustTier: number;
+  commissionPct: string;
+  serviceFeeEgp: string;
+  effectiveFrom: string;
+  isCurrent: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const feeRulesApi = {
+  listAdmin: async (token: string) => {
+    const res = await request<{ success: boolean; data: FeeRule[] }>("/admin/fee-rules", { token });
+    return res.data || [];
+  },
+  createAdmin: (data: any, token: string) =>
+    request<FeeRule>("/admin/fee-rules", { method: "POST", body: data, token }),
+  updateAdmin: (id: string, data: any, token: string) =>
+    request<FeeRule>(`/admin/fee-rules/${id}`, { method: "PATCH", body: data, token }),
+  deleteAdmin: (id: string, token: string) =>
+    request<void>(`/admin/fee-rules/${id}`, { method: "DELETE", token }),
+};
+
+// ─── Refund Policies ─────────────────────────────────────
+
+export interface RefundPolicy {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  type: "FULL_REFUND" | "PARTIAL_REFUND" | "NO_REFUND";
+  deadlineDaysBefore: number;
+  refundPercentage: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const refundPoliciesApi = {
+  listAdmin: async (token: string) => {
+    const res = await request<{ success: boolean; data: RefundPolicy[] }>("/admin/refund-policies", { token });
+    return res.data || [];
+  },
+  createAdmin: (data: any, token: string) =>
+    request<RefundPolicy>("/admin/refund-policies", { method: "POST", body: data, token }),
+  updateAdmin: (id: string, data: any, token: string) =>
+    request<RefundPolicy>(`/admin/refund-policies/${id}`, { method: "PATCH", body: data, token }),
+  deleteAdmin: (id: string, token: string) =>
+    request<void>(`/admin/refund-policies/${id}`, { method: "DELETE", token }),
+};
+
+// ─── Loyalty Rules ───────────────────────────────────────
+
+export interface LoyaltyRule {
+  id: string;
+  earnRate: string;
+  redeemRate: string;
+  expiryDays: number;
+  minRedeemPoints: number;
+  maxRedeemPctPerOrder: string;
+  isCurrent: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const loyaltyRulesApi = {
+  listAdmin: async (token: string) => {
+    const res = await request<{ success: boolean; data: LoyaltyRule[] }>("/admin/loyalty-rules", { token });
+    return res.data || [];
+  },
+  createAdmin: (data: any, token: string) =>
+    request<LoyaltyRule>("/admin/loyalty-rules", { method: "POST", body: data, token }),
+  updateAdmin: (id: string, data: any, token: string) =>
+    request<LoyaltyRule>(`/admin/loyalty-rules/${id}`, { method: "PATCH", body: data, token }),
+  deleteAdmin: (id: string, token: string) =>
+    request<void>(`/admin/loyalty-rules/${id}`, { method: "DELETE", token }),
+};
+
+// ─── Feature Flags ───────────────────────────────────────
+
+export interface FeatureFlag {
+  id: string;
+  key: string;
+  value: boolean;
+  description?: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const featureFlagsApi = {
+  listAdmin: async (token: string) => {
+    const res = await request<{ success: boolean; data: FeatureFlag[] }>("/admin/feature-flags", { token });
+    return res.data || [];
+  },
+  createAdmin: (data: any, token: string) =>
+    request<FeatureFlag>("/admin/feature-flags", { method: "POST", body: data, token }),
+  updateAdmin: (id: string, data: any, token: string) =>
+    request<FeatureFlag>(`/admin/feature-flags/${id}`, { method: "PATCH", body: data, token }),
+  deleteAdmin: (id: string, token: string) =>
+    request<void>(`/admin/feature-flags/${id}`, { method: "DELETE", token }),
+};
+
+// ─── Audience Rules ──────────────────────────────────────
+
+export interface AudienceRule {
+  id: string;
+  labelEn: string;
+  labelAr: string;
+  requiresField: string;
+  validationRule: Record<string, any>;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const audienceRulesApi = {
+  listAdmin: async (token: string) => {
+    const res = await request<{ success: boolean; data: AudienceRule[] }>("/admin/audience-rules", { token });
+    return res.data || [];
+  },
+  createAdmin: (data: any, token: string) =>
+    request<AudienceRule>("/admin/audience-rules", { method: "POST", body: data, token }),
+  updateAdmin: (id: string, data: any, token: string) =>
+    request<AudienceRule>(`/admin/audience-rules/${id}`, { method: "PATCH", body: data, token }),
+  deleteAdmin: (id: string, token: string) =>
+    request<void>(`/admin/audience-rules/${id}`, { method: "DELETE", token }),
+};
+
+// ─── Ticket Templates ────────────────────────────────────
+
+export interface TicketTemplate {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  visualType: "IMAGE" | "COLOR";
+  visualValue: string;
+  defaultPrice?: string | null;
+  iconUrl?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const ticketTemplatesApi = {
+  listAdmin: async (token: string) => {
+    const res = await request<{ success: boolean; data: TicketTemplate[] }>("/admin/ticket-templates", { token });
+    return res.data || [];
+  },
+  createAdmin: (data: any, token: string) =>
+    request<TicketTemplate>("/admin/ticket-templates", { method: "POST", body: data, token }),
+  updateAdmin: (id: string, data: any, token: string) =>
+    request<TicketTemplate>(`/admin/ticket-templates/${id}`, { method: "PATCH", body: data, token }),
+  deleteAdmin: (id: string, token: string) =>
+    request<void>(`/admin/ticket-templates/${id}`, { method: "DELETE", token }),
+};
+
+// ─── Facilities ──────────────────────────────────────────
+
+export interface FacilityItem {
+  id: string;
+  nameEn: string;
+  nameAr: string;
+  iconUrl?: string | null;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const facilitiesApi = {
+  listAdmin: async (token: string) => {
+    const res = await request<{ success: boolean; data: FacilityItem[] }>("/admin/facilities", { token });
+    return res.data || [];
+  },
+  createAdmin: (data: any, token: string) =>
+    request<FacilityItem>("/admin/facilities", { method: "POST", body: data, token }),
+  updateAdmin: (id: string, data: any, token: string) =>
+    request<FacilityItem>(`/admin/facilities/${id}`, { method: "PATCH", body: data, token }),
+  deleteAdmin: (id: string, token: string) =>
+    request<void>(`/admin/facilities/${id}`, { method: "DELETE", token }),
 };
 
 // ─── Admin Dashboard API ────────────────────────────────

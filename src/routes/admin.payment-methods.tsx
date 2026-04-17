@@ -6,12 +6,7 @@ import {
   updatePaymentMethodAdmin,
   deletePaymentMethodAdmin,
 } from "@/lib/admin-api.functions";
-import {
-  AdminCrudPage,
-  type ColumnDef,
-  type FieldDef,
-  type ApiFns,
-} from "@/components/admin/AdminCrudPage";
+import { AdminCrudPage, type ColumnDef, type FieldDef, type ApiFns } from "@/components/admin/AdminCrudPage";
 
 export const Route = createFileRoute("/admin/payment-methods")({
   loader: async () => {
@@ -22,20 +17,43 @@ export const Route = createFileRoute("/admin/payment-methods")({
 });
 
 const columns: ColumnDef[] = [
-  { key: "name", label: "Name" },
-  { key: "code", label: "Code" },
-  { key: "enabled", label: "Enabled", render: (v) => (v ? "Yes" : "No") },
+  {
+    key: "iconUrl",
+    label: "Icon",
+    render: (v) => v ? <img src={v} alt="icon" className="h-6 w-6 object-contain" /> : "—",
+  },
+  { key: "labelEn", label: "Label (EN)" },
+  { key: "labelAr", label: "Label (AR)" },
+  { key: "provider", label: "Provider" },
+  { key: "minAmountEgp", label: "Min Amount", render: (v) => v ? `EGP ${v}` : "—" },
+  { key: "sortOrder", label: "Order" },
+  { key: "isActive", label: "Active", render: (v) => (v ? "✓" : "—") },
 ];
 
 const fields: FieldDef[] = [
-  { key: "name", label: "Name", type: "text", required: true, placeholder: "e.g. Credit Card" },
-  { key: "code", label: "Code", type: "text", required: true, placeholder: "e.g. CC" },
-  { key: "enabled", label: "Enabled", type: "checkbox", defaultValue: true },
+  {
+    key: "provider",
+    label: "Provider",
+    type: "select",
+    required: true,
+    options: [
+      { label: "Card (Generic)", value: "CARD" },
+      { label: "Paymob", value: "PAYMOB" },
+      { label: "Vodafone Cash", value: "VODAFONE_CASH" },
+      { label: "Fawry", value: "FAWRY" },
+      { label: "InstaPay", value: "INSTAPAY" },
+    ],
+  },
+  { key: "labelEn", label: "Label (English)", type: "text", required: true, placeholder: "Credit Card" },
+  { key: "labelAr", label: "Label (Arabic)", type: "text", required: true, placeholder: "بطاقة ائتمان" },
+  { key: "iconUrl", label: "Icon URL", type: "text", placeholder: "https://..." },
+  { key: "minAmountEgp", label: "Min Amount (EGP)", type: "text", placeholder: "10.00" },
+  { key: "sortOrder", label: "Sort Order", type: "number", defaultValue: 0 },
+  { key: "isActive", label: "Active", type: "toggle", defaultValue: true },
 ];
 
 function PaymentMethodsPage() {
   const { data } = Route.useLoaderData();
-
   const createFn = useServerFn(createPaymentMethodAdmin);
   const updateFn = useServerFn(updatePaymentMethodAdmin);
   const deleteFn = useServerFn(deletePaymentMethodAdmin);
@@ -45,21 +63,15 @@ function PaymentMethodsPage() {
       const result = await listPaymentMethodsAdmin();
       return Array.isArray(result) ? result : [];
     },
-    create: async (formData) => {
-      return createFn({ data: formData });
-    },
-    update: async (id, formData) => {
-      return updateFn({ data: { id, updates: formData } });
-    },
-    delete: async (id) => {
-      await deleteFn({ data: { id } });
-    },
+    create: async (formData) => createFn({ data: formData }),
+    update: async (id, formData) => updateFn({ data: { id, updates: formData } }),
+    delete: async (id) => { await deleteFn({ data: { id } }); },
   };
 
   return (
     <AdminCrudPage
       title="Payment Methods"
-      subtitle="Configure payment methods"
+      subtitle="Configure available payment providers and methods"
       columns={columns}
       fields={fields}
       initialData={data}
