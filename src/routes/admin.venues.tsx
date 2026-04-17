@@ -48,8 +48,8 @@ function VenuesPage() {
     const fetchMaps = async () => {
       try {
         const [organizersData, governoratesData] = await Promise.all([
-          organizersFn({ data: { page: 1, limit: 100 } }),
-          governoratesFn({ data: {} }),
+          organizersFn({ data: { page: 1, limit: 50 } }),
+          governoratesFn(),
         ]);
 
         const orgMap: Record<string, string> = {};
