@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Archive, CheckCircle2, Loader2, Plus, RefreshCw, XCircle } from "lucide-react";
 import { ApiStatusBadge } from "@/components/admin/AdminCrudPage";
 import {
@@ -9,6 +9,8 @@ import {
   canWriteVenuesAdmin,
   listVenuesAdmin,
   rejectVenueAdmin,
+  listOrganizersAdmin,
+  listGovernoratesAdmin,
 } from "@/lib/admin-api.functions";
 import type { Venue } from "@/lib/api-client";
 
@@ -29,6 +31,8 @@ function VenuesPage() {
   const approveFn = useServerFn(approveVenueAdmin);
   const rejectFn = useServerFn(rejectVenueAdmin);
   const archiveFn = useServerFn(archiveVenueAdmin);
+  const organizersFn = useServerFn(listOrganizersAdmin);
+  const governoratesFn = useServerFn(listGovernoratesAdmin);
 
   const [rows, setRows] = useState<Venue[]>(list.rows);
   const [search, setSearch] = useState("");
@@ -37,6 +41,38 @@ function VenuesPage() {
   const [governorateFilter, setGovernorateFilter] = useState("");
   const [busyAction, setBusyAction] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [organizerMap, setOrganizerMap] = useState<Record<string, string>>({});
+  const [governorateMap, setGovernorateMap] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const fetchMaps = async () => {
+      try {
+        const [organizersData, governoratesData] = await Promise.all([
+          organizersFn({ data: { page: 1, limit: 100 } }),
+          governoratesFn({ data: {} }),
+        ]);
+
+        const orgMap: Record<string, string> = {};
+        if (Array.isArray(organizersData)) {
+          organizersData.forEach((org: any) => {
+            orgMap[org.id] = org.displayNameEn || org.id;
+          });
+        }
+        setOrganizerMap(orgMap);
+
+        const govMap: Record<string, string> = {};
+        if (Array.isArray(governoratesData)) {
+          governoratesData.forEach((gov: any) => {
+            govMap[gov.id] = gov.nameEn || gov.id;
+          });
+        }
+        setGovernorateMap(govMap);
+      } catch (err) {
+        console.error("Failed to fetch organizers/governorates:", err);
+      }
+    };
+    fetchMaps();
+  }, [organizersFn, governoratesFn]);
 
   const refresh = async () => {
     setError(null);
@@ -221,7 +257,7 @@ function VenuesPage() {
             <option value="">All Governorates</option>
             {governorateOptions.map((governorateId) => (
               <option key={governorateId} value={governorateId}>
-                {governorateId}
+                {governorateMap[governorateId] || governorateId}
               </option>
             ))}
           </select>
@@ -256,11 +292,11 @@ function VenuesPage() {
                       <p className="text-xs text-muted-foreground">{row.nameAr || "—"}</p>
                     </td>
                     <td className="px-5 py-3.5 text-foreground">{row.type}</td>
-                    <td className="px-5 py-3.5 text-foreground">{row.governorateId}</td>
+                    <td className="px-5 py-3.5 text-foreground">{governorateMap[row.governorateId] || row.governorateId}</td>
                     <td className="px-5 py-3.5 text-foreground">{row.totalCapacity.toLocaleString()}</td>
                     <td className="px-5 py-3.5"><ApiStatusBadge status={row.status} /></td>
                     <td className="px-5 py-3.5 text-xs text-muted-foreground">
-                      {row.submittedByOrgId ? row.submittedByOrgId.slice(0, 8) : "—"}
+                      {row.submittedByOrgId ? (organizerMap[row.submittedByOrgId] || row.submittedByOrgId) : "—"}
                     </td>
                     <td className="px-5 py-3.5">
                       <div className="flex items-center justify-end gap-1">
