@@ -44,21 +44,8 @@ function BannersPage() {
       const result = await listBannersAdmin();
       return Array.isArray(result) ? result : [];
     },
-    create: async (formData) => {
-      const payload = {
-        ...formData,
-        linkType: "NONE",
-        sortOrder: 0,
-      };
-      return createFn({ data: payload });
-    },
-    update: async (id, formData) => {
-      const updates = {
-        ...formData,
-        linkType: "NONE",
-      };
-      return updateFn({ data: { id, updates } });
-    },
+    create: async (formData) => createFn({ data: formData }),
+    update: async (id, formData) => updateFn({ data: { id, updates: formData } }),
     delete: async (id) => {
       await deleteFn({ data: { id } });
     },
