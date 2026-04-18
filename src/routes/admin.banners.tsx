@@ -23,37 +23,13 @@ const columns: ColumnDef[] = [
     render: (v) =>
       v ? <img src={v} alt="banner" className="h-10 w-20 object-cover rounded" /> : "—",
   },
-  { key: "linkType", label: "Link Type" },
-  {
-    key: "linkTarget",
-    label: "Link Target",
-    render: (v) =>
-      v ? <span className="text-xs font-mono truncate max-w-[160px] block">{v}</span> : "—",
-  },
-  { key: "sortOrder", label: "Order" },
+  { key: "title", label: "Title" },
   { key: "isActive", label: "Active", render: (v) => (v ? "✓" : "—") },
-  { key: "startsAt", label: "Starts", render: (v) => (v ? new Date(v).toLocaleDateString() : "—") },
-  { key: "endsAt", label: "Ends", render: (v) => (v ? new Date(v).toLocaleDateString() : "—") },
 ];
 
 const fields: FieldDef[] = [
-  { key: "imageUrl", label: "Image URL", type: "text", required: true, placeholder: "https://..." },
-  {
-    key: "linkType",
-    label: "Link Type",
-    type: "select",
-    required: true,
-    options: [
-      { label: "URL", value: "URL" },
-      { label: "Event", value: "EVENT" },
-      { label: "Category", value: "CATEGORY" },
-      { label: "None", value: "NONE" },
-    ],
-  },
-  { key: "linkTarget", label: "Link Target", type: "text", placeholder: "URL or UUID" },
-  { key: "sortOrder", label: "Sort Order", type: "number", defaultValue: 0 },
-  { key: "startsAt", label: "Starts At", type: "text", required: true, placeholder: "2026-04-18T00:00:00Z" },
-  { key: "endsAt", label: "Ends At", type: "text", required: true, placeholder: "2026-05-18T00:00:00Z" },
+  { key: "imageUrl", label: "Image URL", type: "text", required: true, placeholder: "https://example.com/banner.jpg" },
+  { key: "title", label: "Title", type: "text", placeholder: "Summer Sale" },
   { key: "isActive", label: "Active", type: "toggle", defaultValue: true },
 ];
 
@@ -68,8 +44,21 @@ function BannersPage() {
       const result = await listBannersAdmin();
       return Array.isArray(result) ? result : [];
     },
-    create: async (formData) => createFn({ data: formData }),
-    update: async (id, formData) => updateFn({ data: { id, updates: formData } }),
+    create: async (formData) => {
+      const payload = {
+        ...formData,
+        linkType: "NONE",
+        sortOrder: 0,
+      };
+      return createFn({ data: payload });
+    },
+    update: async (id, formData) => {
+      const updates = {
+        ...formData,
+        linkType: "NONE",
+      };
+      return updateFn({ data: { id, updates } });
+    },
     delete: async (id) => {
       await deleteFn({ data: { id } });
     },
