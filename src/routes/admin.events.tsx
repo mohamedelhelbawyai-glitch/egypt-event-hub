@@ -1,7 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, Loader2, Filter, X } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Filter, Plus, X } from "lucide-react";
 import { listEventsAdmin, listOrganizersAdmin, listCategoriesAdmin } from "@/lib/admin-api.functions";
 import { eventsApi } from "@/lib/api-client";
 import { getAdminSession } from "@/lib/admin-auth.functions";
@@ -57,7 +57,7 @@ function EventActions({
   token,
   onRefresh,
 }: {
-  row: Record<string, any>;
+  row: Record<string, unknown>;
   token: string;
   onRefresh: () => Promise<void>;
 }) {
@@ -72,7 +72,7 @@ function EventActions({
   const approve = async () => {
     setLoading("approve");
     try {
-      await eventsApi.approveAdmin(row.id, token);
+      await eventsApi.approveAdmin(String(row.id), token);
       await onRefresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to approve event";
@@ -96,7 +96,7 @@ function EventActions({
     setShowRejectDialog(false);
     setLoading("reject");
     try {
-      await eventsApi.rejectAdmin(row.id, rejectReason, token);
+      await eventsApi.rejectAdmin(String(row.id), rejectReason, token);
       await onRefresh();
     } catch (error) {
       const message = error instanceof Error ? error.message : "Failed to reject event";
@@ -157,6 +157,7 @@ function EventActions({
 
 function EventsPage() {
   const { data, token } = Route.useLoaderData();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
   const listFn = useServerFn(listEventsAdmin);
   const [filters, setFilters] = useState({
     status: "",
@@ -169,6 +170,7 @@ function EventsPage() {
   const [organizers, setOrganizers] = useState<Array<{ id: string; displayNameEn: string; status?: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [showFilterDrawer, setShowFilterDrawer] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const STATUS_OPTIONS = [
     "DRAFT",
@@ -187,6 +189,12 @@ function EventsPage() {
   const organizersFn = useServerFn(listOrganizersAdmin);
 
   useEffect(() => {
+    const createdMessage = window.sessionStorage.getItem("tazkara:event-created");
+    if (createdMessage) {
+      setSuccessMessage(createdMessage);
+      window.sessionStorage.removeItem("tazkara:event-created");
+    }
+
     const fetchData = async () => {
       try {
         setLoading(true);
@@ -225,8 +233,17 @@ function EventsPage() {
     setFilterKey((prev) => prev + 1);
   };
 
+  if (pathname === "/admin/events/new") {
+    return <Outlet />;
+  }
+
   return (
     <div>
+      {successMessage && (
+        <div className="mx-8 mt-6 rounded-xl border border-success/30 bg-success/10 px-4 py-3 text-sm font-medium text-success">
+          {successMessage}
+        </div>
+      )}
       <AdminCrudPage
         key={filterKey}
         title="Events"
@@ -255,14 +272,23 @@ function EventsPage() {
           <EventActions row={row} token={token} onRefresh={refresh} />
         )}
         filterButton={
-          <button
-            onClick={() => setShowFilterDrawer(true)}
-            className="flex items-center gap-2 rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-muted-foreground shadow-soft hover:text-foreground hover:bg-accent transition-colors"
-            title="Filters"
-          >
-            <Filter size={16} />
-            <span className="font-medium">Filters</span>
-          </button>
+          <>
+            <button
+              onClick={() => setShowFilterDrawer(true)}
+              className="flex items-center gap-2 rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm text-muted-foreground shadow-soft hover:text-foreground hover:bg-accent transition-colors"
+              title="Filters"
+            >
+              <Filter size={16} />
+              <span className="font-medium">Filters</span>
+            </button>
+            <Link
+              to="/admin/events/new"
+              className="inline-flex items-center gap-2 rounded-xl admin-gradient px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-brand transition-transform hover:-translate-y-0.5"
+            >
+              <Plus size={16} strokeWidth={2.5} />
+              New Event
+            </Link>
+          </>
         }
       />
 
