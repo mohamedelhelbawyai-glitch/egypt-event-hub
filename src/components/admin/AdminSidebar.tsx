@@ -103,30 +103,31 @@ export function AdminSidebar({ adminName, adminRole, onLogout }: AdminSidebarPro
   return (
     <aside className="flex h-screen w-64 flex-col bg-sidebar text-sidebar-foreground border-r border-sidebar-border">
       {/* Brand */}
-      <div className="flex items-center gap-3 px-5 py-5">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl admin-gradient shadow-brand">
-          <Ticket size={20} className="text-primary-foreground" strokeWidth={2.25} />
+      <div className="flex items-center gap-3 px-5 py-5 border-b border-sidebar-border">
+        <div className="flex h-9 w-9 items-center justify-center rounded-xl teal-gradient shadow-brand">
+          <Ticket size={18} className="text-white" strokeWidth={2.25} />
         </div>
         <div>
-          <h1 className="text-base font-extrabold tracking-tight text-foreground">Tazkara</h1>
-          <p className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+          <h1 className="text-base font-bold tracking-tight text-white">Tazkara</h1>
+          <p className="text-[10px] font-medium uppercase tracking-wider" style={{color: '#5A8CB0'}}>
             Admin Panel
           </p>
         </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 pb-4 space-y-3">
+      <nav className="flex-1 overflow-y-auto scrollbar-thin px-3 pb-4 pt-3 space-y-4">
         {navGroups.map((group) => (
           <div key={group.label}>
             <button
               onClick={() => toggleGroup(group.label)}
-              className="flex w-full items-center justify-between px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.08em] text-muted-foreground/70 hover:text-muted-foreground transition-colors"
+              className="flex w-full items-center justify-between px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] transition-colors"
+              style={{color: '#5A8CB0'}}
             >
               {group.label}
               <ChevronDown
-                size={12}
-                className={`transition-transform ${collapsed[group.label] ? "-rotate-90" : ""}`}
+                size={11}
+                className={`transition-transform duration-200 ${collapsed[group.label] ? "-rotate-90" : ""}`}
               />
             </button>
             {!collapsed[group.label] && (
@@ -137,22 +138,25 @@ export function AdminSidebar({ adminName, adminRole, onLogout }: AdminSidebarPro
                     <Link
                       key={item.to}
                       to={item.to}
-                      className={`group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+                      className={`group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm font-medium transition-all duration-150 ${
                         active
-                          ? "admin-gradient text-primary-foreground shadow-brand"
+                          ? "bg-[#2E86AB] text-white shadow-brand"
                           : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                       }`}
                     >
                       <span
-                        className={`flex h-7 w-7 items-center justify-center rounded-lg transition-colors ${
+                        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md transition-colors ${
                           active
-                            ? "bg-white/15 text-primary-foreground"
-                            : "text-muted-foreground group-hover:text-sidebar-accent-foreground"
+                            ? "text-white"
+                            : "opacity-60 group-hover:opacity-100"
                         }`}
                       >
                         {item.icon}
                       </span>
                       <span className="truncate">{item.label}</span>
+                      {active && (
+                        <span className="ml-auto h-1.5 w-1.5 rounded-full bg-white/60" />
+                      )}
                     </Link>
                   );
                 })}
@@ -163,23 +167,24 @@ export function AdminSidebar({ adminName, adminRole, onLogout }: AdminSidebarPro
       </nav>
 
       {/* User card */}
-      <div className="mx-3 mb-3 rounded-2xl border border-sidebar-border bg-card p-3 shadow-soft">
+      <div className="mx-3 mb-3 rounded-xl border border-sidebar-border p-3" style={{background: '#1A3C5E'}}>
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl admin-gradient text-sm font-bold text-primary-foreground shadow-brand">
+          <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg teal-gradient text-xs font-bold text-white">
             {adminName.charAt(0).toUpperCase()}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold truncate text-foreground">{adminName}</p>
-            <p className="text-[11px] text-muted-foreground capitalize truncate">
+            <p className="text-sm font-semibold truncate text-white">{adminName}</p>
+            <p className="text-[11px] capitalize truncate" style={{color: '#5A8CB0'}}>
               {adminRole.replace("_", " ").toLowerCase()}
             </p>
           </div>
           <button
             onClick={onLogout}
-            className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+            className="rounded-md p-1.5 transition-colors hover:bg-red-500/20 hover:text-red-400"
+            style={{color: '#5A8CB0'}}
             title="Logout"
           >
-            <LogOut size={16} />
+            <LogOut size={15} />
           </button>
         </div>
       </div>
