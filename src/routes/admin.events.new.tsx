@@ -157,6 +157,13 @@ const createEventSchema = z
     if (value.refundMode === "custom" && value.customRefundType === "PARTIAL" && value.customRefundPercentage == null)
       ctx.addIssue({ code: "custom", path: ["customRefundPercentage"], message: "Refund percentage is required" });
 
+    if (value.format === "FREE") {
+      value.ticketTypes.forEach((ticket, index) => {
+        if (Number(ticket.price) !== 0)
+          ctx.addIssue({ code: "custom", path: ["ticketTypes", index, "price"], message: "Free events cannot have paid tickets — price must be 0" });
+      });
+    }
+
     value.ticketTypes.forEach((ticket, index) => {
       if (ticket.maxPerOrder > ticket.quantityTotal)
         ctx.addIssue({ code: "custom", path: ["ticketTypes", index, "maxPerOrder"], message: "Max per order cannot exceed quantity" });
@@ -419,11 +426,22 @@ function NewEventPage() {
     [coverImageUrl],
   );
 
+  const isFreeEvent = format === "FREE";
+
   // Reset location fields when format changes
   useEffect(() => {
     resetField("venueId");
     resetField("streamUrl");
   }, [format, resetField]);
+
+  // Lock all ticket prices to 0 when format is FREE
+  useEffect(() => {
+    if (isFreeEvent) {
+      fields.forEach((_, index) => {
+        setValue(`ticketTypes.${index}.price`, 0, { shouldValidate: false });
+      });
+    }
+  }, [isFreeEvent, fields.length, setValue]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Warn on accidental navigation
   useEffect(() => {
@@ -1015,8 +1033,18 @@ function NewEventPage() {
             </div>
             <div data-error={!!errors.ticketTypes?.[index]?.price}>
               <label className="mb-1.5 block text-sm font-semibold">Price (EGP)</label>
-              <input type="number" min={0} {...register(`ticketTypes.${index}.price`)} className={input} />
-              {fieldError(errors.ticketTypes?.[index]?.price)}
+              <input
+                type="number"
+                min={0}
+                disabled={isFreeEvent}
+                {...register(`ticketTypes.${index}.price`)}
+                className={`${input} disabled:cursor-not-allowed disabled:opacity-50`}
+              />
+              {isFreeEvent ? (
+                <p className="mt-1 text-xs text-muted-foreground">Free events cannot have paid tickets.</p>
+              ) : (
+                fieldError(errors.ticketTypes?.[index]?.price)
+              )}
             </div>
             <div data-error={!!errors.ticketTypes?.[index]?.quantityTotal}>
               <label className="mb-1.5 block text-sm font-semibold">Total Tickets</label>

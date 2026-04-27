@@ -16,6 +16,7 @@ import {
   Ban,
   Pencil,
   X,
+  Clock,
 } from "lucide-react";
 import { z } from "zod";
 import {
@@ -209,12 +210,14 @@ function TicketRow({
   eventId,
   onRefresh,
   templates,
+  isFreeEvent,
 }: {
   ticket: any;
   token: string;
   eventId: string;
   onRefresh: () => Promise<void>;
   templates: TicketTemplate[];
+  isFreeEvent?: boolean;
 }) {
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -327,7 +330,14 @@ function TicketRow({
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold">Price (EGP)</label>
-            <input type="number" min={0} {...register("price")} className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+            <input
+              type="number"
+              min={0}
+              disabled={isFreeEvent}
+              {...register("price")}
+              className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+            />
+            {isFreeEvent && <p className="mt-1 text-xs text-muted-foreground">Free events cannot have paid tickets.</p>}
           </div>
           <div>
             <label className="mb-1 block text-xs font-semibold">Total Tickets</label>
@@ -442,17 +452,19 @@ function AddTicketForm({
   token,
   templates,
   onDone,
+  isFreeEvent,
 }: {
   eventId: string;
   token: string;
   templates: TicketTemplate[];
   onDone: () => Promise<void>;
+  isFreeEvent?: boolean;
 }) {
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<TicketTypeForm>({
     resolver: zodResolver(ticketTypeSchema) as any,
-    defaultValues: blankTicket(),
+    defaultValues: isFreeEvent ? { ...blankTicket(), price: 0 } : blankTicket(),
   });
 
   const onSave = handleSubmit(async (values) => {
@@ -499,7 +511,7 @@ function AddTicketForm({
             setValue("nameEn", tpl.nameEn);
             setValue("visualType", tpl.visualType as any);
             setValue("visualValue", tpl.visualValue || "#7c3aed");
-            setValue("price", Number(tpl.defaultPrice || 0));
+            setValue("price", isFreeEvent ? 0 : Number(tpl.defaultPrice || 0));
           }}
           className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         >
@@ -536,7 +548,14 @@ function AddTicketForm({
         </div>
         <div>
           <label className="mb-1 block text-xs font-semibold">Price (EGP)</label>
-          <input type="number" min={0} {...register("price")} className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+          <input
+            type="number"
+            min={0}
+            disabled={isFreeEvent}
+            {...register("price")}
+            className="w-full rounded-lg border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+          />
+          {isFreeEvent && <p className="mt-1 text-xs text-muted-foreground">Free events cannot have paid tickets.</p>}
         </div>
         <div>
           <label className="mb-1 block text-xs font-semibold">Total Tickets</label>
@@ -961,6 +980,44 @@ function EventDetailPage() {
         )}
       </div>
 
+      {/* Status timeline */}
+      <div className="mx-8 mt-5 rounded-2xl border border-border bg-card p-5 shadow-card">
+        <div className="mb-3 flex items-center gap-2">
+          <Clock size={15} className="text-muted-foreground" />
+          <h3 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Status Timeline</h3>
+        </div>
+        <ol className="relative space-y-3 border-l border-border pl-5">
+          {[
+            { label: "Created", ts: event?.createdAt, color: "bg-primary" },
+            { label: "Last Updated", ts: event?.updatedAt, color: "bg-muted-foreground" },
+            ...(event?.approvedAt ? [{ label: "Approved", ts: event.approvedAt, color: "bg-success" }] : []),
+            ...(event?.rejectedAt ? [{ label: "Rejected", ts: event.rejectedAt, color: "bg-destructive" }] : []),
+            ...(event?.cancelledAt ? [{ label: "Cancelled", ts: event.cancelledAt, color: "bg-destructive" }] : []),
+            ...(event?.completedAt ? [{ label: "Completed", ts: event.completedAt, color: "bg-muted-foreground" }] : []),
+          ]
+            .filter((e) => e.ts)
+            .sort((a, b) => new Date(a.ts!).getTime() - new Date(b.ts!).getTime())
+            .map(({ label, ts, color }) => (
+              <li key={label} className="flex items-start gap-3">
+                <span className={`absolute -left-1.5 mt-1 h-3 w-3 rounded-full border-2 border-card ${color}`} />
+                <div>
+                  <p className="text-xs font-semibold text-foreground">{label}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {new Date(ts!).toLocaleString("en-EG", { dateStyle: "medium", timeStyle: "short" })}
+                  </p>
+                </div>
+              </li>
+            ))}
+          <li className="flex items-start gap-3">
+            <span className="absolute -left-1.5 mt-1 h-3 w-3 animate-pulse rounded-full border-2 border-card bg-primary" />
+            <div>
+              <p className="text-xs font-semibold text-foreground">Current Status</p>
+              <p className="text-xs font-bold text-primary">{event?.status ?? "—"}</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+
       {/* Edit form */}
       <form onSubmit={onSubmit} className="space-y-6 p-8">
         <fieldset disabled={!isEditable} className="space-y-6 disabled:opacity-60">
@@ -1204,6 +1261,7 @@ function EventDetailPage() {
                 eventId={eventId}
                 templates={ticketTemplates}
                 onRefresh={refreshEvent}
+                isFreeEvent={event?.format === "FREE"}
               />
             ))}
           </div>
@@ -1214,6 +1272,7 @@ function EventDetailPage() {
                 eventId={eventId}
                 token={token}
                 templates={ticketTemplates}
+                isFreeEvent={event?.format === "FREE"}
                 onDone={async () => {
                   setShowAddTicket(false);
                   await refreshEvent();
