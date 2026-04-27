@@ -9,12 +9,13 @@ import {
   createEventAdmin,
   listAudienceRulesAdmin,
   listCategoriesAdmin,
+  listOrganizersAdmin,
   listRefundPoliciesAdmin,
   listTagsAdmin,
   listTicketTemplatesAdmin,
   listVenuesAdmin,
 } from "@/lib/admin-api.functions";
-import type { AudienceRule, Category, RefundPolicy, Tag, TicketTemplate, Venue } from "@/lib/api-client";
+import type { AudienceRule, Category, OrganizerProfile, RefundPolicy, Tag, TicketTemplate, Venue } from "@/lib/api-client";
 
 const formats = ["GA", "SEATED", "ONLINE", "HYBRID", "FREE"] as const;
 const visibilityOptions = ["PUBLIC", "PRIVATE"] as const;
@@ -36,6 +37,7 @@ const ticketSchema = z.object({
 });
 
 const createEventSchema = z.object({
+  organizerId: z.string().optional(),
   titleAr: z.string().min(3, "Arabic title must be at least 3 characters").max(120),
   titleEn: z.string().min(3, "English title must be at least 3 characters").max(120),
   format: z.enum(formats),
@@ -127,6 +129,7 @@ const blankTicket = (): CreateEventForm["ticketTypes"][number] => ({
 });
 
 const defaultValues: CreateEventForm = {
+  organizerId: "",
   titleAr: "",
   titleEn: "",
   format: "GA",
@@ -153,13 +156,14 @@ const defaultValues: CreateEventForm = {
 
 export const Route = createFileRoute("/admin/events/new")({
   loader: async () => {
-    const [categories, tags, audienceRules, refundPolicies, ticketTemplates, venueList] = await Promise.all([
+    const [categories, tags, audienceRules, refundPolicies, ticketTemplates, venueList, organizerList] = await Promise.all([
       listCategoriesAdmin(),
       listTagsAdmin(),
       listAudienceRulesAdmin(),
       listRefundPoliciesAdmin(),
       listTicketTemplatesAdmin(),
       listVenuesAdmin({ data: { page: 1, limit: 20 } }),
+      listOrganizersAdmin({ data: { page: 1, limit: 100 } }),
     ]);
 
     return {
@@ -169,6 +173,7 @@ export const Route = createFileRoute("/admin/events/new")({
       refundPolicies: Array.isArray(refundPolicies) ? refundPolicies : [],
       ticketTemplates: Array.isArray(ticketTemplates) ? ticketTemplates : [],
       venues: Array.isArray(venueList?.rows) ? venueList.rows : [],
+      organizers: Array.isArray(organizerList) ? organizerList : [],
     };
   },
   component: NewEventPage,
@@ -187,6 +192,7 @@ function listFromLines(value?: string) {
 
 function buildPayload(values: CreateEventForm, status?: "DRAFT") {
   const payload: Record<string, unknown> = {
+    ...(values.organizerId ? { organizerId: values.organizerId } : {}),
     titleAr: values.titleAr.trim(),
     titleEn: values.titleEn.trim(),
     format: values.format,
@@ -250,13 +256,14 @@ function sectionTitle(number: number, title: string) {
 }
 
 function NewEventPage() {
-  const { categories, tags, audienceRules, refundPolicies, ticketTemplates, venues } = Route.useLoaderData() as {
+  const { categories, tags, audienceRules, refundPolicies, ticketTemplates, venues, organizers } = Route.useLoaderData() as {
     categories: Category[];
     tags: Tag[];
     audienceRules: AudienceRule[];
     refundPolicies: RefundPolicy[];
     ticketTemplates: TicketTemplate[];
     venues: Venue[];
+    organizers: OrganizerProfile[];
   };
   const navigate = useNavigate();
   const createFn = useServerFn(createEventAdmin);
@@ -275,7 +282,8 @@ function NewEventPage() {
     getValues,
   } = useForm<CreateEventForm>({
     defaultValues,
-    resolver: zodResolver(createEventSchema),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    resolver: zodResolver(createEventSchema) as any,
     mode: "onBlur",
   });
 
@@ -334,7 +342,7 @@ function NewEventPage() {
   );
 
   const saveDraft = () => {
-    submitValues(getValues(), "DRAFT");
+    submitValues(getValues() as CreateEventForm, "DRAFT");
   };
 
   return (
@@ -361,6 +369,25 @@ function NewEventPage() {
 
         <section className="rounded-2xl border border-border bg-card p-6 shadow-card">
           {sectionTitle(1, "Basic Information")}
+
+          {/* Organizer assignment (admin-only) */}
+          <div className="mb-4" data-error={!!errors.organizerId}>
+            <label htmlFor="organizerId" className="mb-1.5 block text-sm font-semibold">
+              Assign to Organizer <span className="font-normal text-muted-foreground">(optional — leave blank for platform-owned event)</span>
+            </label>
+            <select id="organizerId" {...register("organizerId")} className="w-full rounded-xl border border-input bg-card px-3.5 py-2.5 text-sm shadow-soft focus:outline-none focus:ring-2 focus:ring-ring">
+              <option value="">— No organizer (platform event) —</option>
+              {organizers
+                .filter((org) => (org as { status?: string }).status === "APPROVED" || (org as { status?: string }).status === "ACTIVE")
+                .map((org) => (
+                  <option key={org.id} value={org.id}>
+                    {org.displayNameEn}
+                  </option>
+                ))}
+            </select>
+            {fieldError(errors.organizerId)}
+          </div>
+
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div data-error={!!errors.titleAr}>
               <label htmlFor="titleAr" className="mb-1.5 block text-sm font-semibold">عنوان الفعالية</label>

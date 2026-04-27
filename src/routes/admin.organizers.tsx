@@ -50,7 +50,7 @@ function OrganizerActions({
   token: string;
   onRefresh: () => Promise<void>;
 }) {
-  const [loading, setLoading] = useState<"approve" | "reject" | "suspend" | null>(null);
+  const [loading, setLoading] = useState<"approve" | "reject" | "suspend" | "reactivate" | null>(null);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
   const [showSuspendDialog, setShowSuspendDialog] = useState(false);

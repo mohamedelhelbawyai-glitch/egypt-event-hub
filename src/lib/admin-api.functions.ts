@@ -98,7 +98,7 @@ export const listEventsAdmin = createServerFn({ method: "GET" })
 
 export const createEventAdmin = createServerFn({ method: "POST" })
   .inputValidator(z.record(z.string(), z.unknown()))
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<any> => {
     const token = requireAdminToken();
     const result = await eventsApi.createAdmin(data as any, token);
     return result;
@@ -111,7 +111,7 @@ export const updateEventAdmin = createServerFn({ method: "POST" })
       updates: z.record(z.string(), z.unknown()),
     })
   )
-  .handler(async ({ data }) => {
+  .handler(async ({ data }): Promise<any> => {
     const token = requireAdminToken();
     const result = await eventsApi.updateAdmin(data.id, data.updates as any, token);
     return result;
@@ -126,6 +126,38 @@ export const deleteEventAdmin = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const token = requireAdminToken();
     await eventsApi.deleteAdmin(data.id, token);
+    return { success: true };
+  });
+
+export const getEventAdmin = createServerFn({ method: "GET" })
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    const result = await eventsApi.getAdmin(data.id, token);
+    return unwrapData<any>(result) as any;
+  });
+
+export const approveEventAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string() }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    const result = await eventsApi.approveAdmin(data.id, token);
+    return unwrapData<any>(result) as any;
+  });
+
+export const rejectEventAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string(), reason: z.string().min(1) }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await eventsApi.rejectAdmin(data.id, data.reason, token);
+    return { success: true };
+  });
+
+export const cancelEventAdmin = createServerFn({ method: "POST" })
+  .inputValidator(z.object({ id: z.string(), reason: z.string().min(1) }))
+  .handler(async ({ data }) => {
+    const token = requireAdminToken();
+    await eventsApi.cancelAdmin(data.id, data.reason, token);
     return { success: true };
   });
 

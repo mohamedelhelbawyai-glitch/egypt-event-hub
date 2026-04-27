@@ -743,6 +743,13 @@ export const eventsApi = {
       body: { reason },
       token,
     }),
+
+  cancelAdmin: (id: string, reason: string, token: string) =>
+    request<any>(`/admin/events/${id}/cancel`, {
+      method: "POST",
+      body: { cancellationReason: reason },
+      token,
+    }),
 };
 
 // ─── Orders API ──────────────────────────────────────────

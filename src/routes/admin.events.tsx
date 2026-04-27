@@ -1,7 +1,7 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, Loader2, Filter, Plus, X } from "lucide-react";
+import { CheckCircle, XCircle, Loader2, Filter, Plus, X, Eye } from "lucide-react";
 import { listEventsAdmin, listOrganizersAdmin, listCategoriesAdmin } from "@/lib/admin-api.functions";
 import { eventsApi } from "@/lib/api-client";
 import { getAdminSession } from "@/lib/admin-auth.functions";
@@ -63,11 +63,16 @@ function EventActions({
 }) {
   const [loading, setLoading] = useState<"approve" | "reject" | null>(null);
   const [showRejectDialog, setShowRejectDialog] = useState(false);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [rejectReason, setRejectReason] = useState("");
 
   const canAct = row.status === "PENDING_REVIEW";
 
-  if (!canAct) return null;
+  const showError = (msg: string) => {
+    setErrorMessage(msg);
+    setShowErrorDialog(true);
+  };
 
   const approve = async () => {
     setLoading("approve");
@@ -75,64 +80,67 @@ function EventActions({
       await eventsApi.approveAdmin(String(row.id), token);
       await onRefresh();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to approve event";
-      alert(`Error: ${message}`);
-      console.error("Approve event error:", error);
+      showError(error instanceof Error ? error.message : "Failed to approve event");
     } finally {
       setLoading(null);
     }
   };
 
-  const handleRejectClick = () => {
-    setShowRejectDialog(true);
-    setRejectReason("");
-  };
-
   const confirmReject = async () => {
-    if (!rejectReason.trim()) {
-      alert("Please provide a rejection reason");
-      return;
-    }
+    if (!rejectReason.trim()) return;
     setShowRejectDialog(false);
     setLoading("reject");
     try {
       await eventsApi.rejectAdmin(String(row.id), rejectReason, token);
       await onRefresh();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to reject event";
-      alert(`Error: ${message}`);
-      console.error("Reject event error:", error);
+      showError(error instanceof Error ? error.message : "Failed to reject event");
     } finally {
       setLoading(null);
+      setRejectReason("");
     }
   };
 
   return (
     <>
-      <button
-        onClick={approve}
-        disabled={!!loading}
-        className="rounded-lg p-2 text-muted-foreground hover:bg-success/10 hover:text-success transition-colors"
-        title="Approve"
+      {/* View / Edit link — always visible */}
+      <Link
+        to="/admin/events/$eventId"
+        params={{ eventId: String(row.id) }}
+        className="rounded-lg p-2 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+        title="View / Edit"
       >
-        {loading === "approve" ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
-      </button>
-      <button
-        onClick={handleRejectClick}
-        disabled={!!loading}
-        className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
-        title="Reject"
-      >
-        {loading === "reject" ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
-      </button>
+        <Eye size={14} />
+      </Link>
 
+      {/* Approve & Reject — only for PENDING_REVIEW */}
+      {canAct && (
+        <>
+          <button
+            onClick={approve}
+            disabled={!!loading}
+            className="rounded-lg p-2 text-muted-foreground hover:bg-success/10 hover:text-success transition-colors"
+            title="Approve"
+          >
+            {loading === "approve" ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle size={14} />}
+          </button>
+          <button
+            onClick={() => { setRejectReason(""); setShowRejectDialog(true); }}
+            disabled={!!loading}
+            className="rounded-lg p-2 text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-colors"
+            title="Reject"
+          >
+            {loading === "reject" ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
+          </button>
+        </>
+      )}
+
+      {/* Reject dialog */}
       <AlertDialog open={showRejectDialog} onOpenChange={setShowRejectDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Reject Event</AlertDialogTitle>
-            <AlertDialogDescription>
-              Please provide a reason for rejecting this event.
-            </AlertDialogDescription>
+            <AlertDialogDescription>Please provide a reason for rejecting this event.</AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
             <textarea
@@ -145,9 +153,22 @@ function EventActions({
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmReject} className="bg-destructive hover:bg-destructive/90">
+            <AlertDialogAction onClick={confirmReject} disabled={!rejectReason.trim()} className="bg-destructive hover:bg-destructive/90">
               Reject Event
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Error dialog (replaces alert()) */}
+      <AlertDialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Error</AlertDialogTitle>
+            <AlertDialogDescription>{errorMessage}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowErrorDialog(false)}>OK</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -199,7 +220,7 @@ function EventsPage() {
       try {
         setLoading(true);
         const [categoriesData, organizersData] = await Promise.all([
-          categoriesFn({ data: {} }),
+          categoriesFn(),
           organizersFn({ data: { page: 1, limit: 50 } }),
         ]);
         setCategories(Array.isArray(categoriesData) ? categoriesData : []);
