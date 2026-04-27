@@ -30,7 +30,19 @@ export const Route = createFileRoute("/admin/events")({
 });
 
 const columns: ColumnDef[] = [
-  { key: "titleEn", label: "Title" },
+  {
+    key: "titleEn",
+    label: "Title",
+    render: (v, row) => (
+      <Link
+        to="/admin/events/$eventId"
+        params={{ eventId: String(row.id) }}
+        className="font-medium hover:text-primary hover:underline"
+      >
+        {v}
+      </Link>
+    ),
+  },
   {
     key: "format",
     label: "Format",
