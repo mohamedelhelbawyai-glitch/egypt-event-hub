@@ -266,7 +266,7 @@ function EventsPage() {
     setFilterKey((prev) => prev + 1);
   };
 
-  if (pathname === "/admin/events/new") {
+  if (pathname.startsWith("/admin/events/")) {
     return <Outlet />;
   }
 
