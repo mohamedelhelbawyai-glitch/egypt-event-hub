@@ -233,7 +233,6 @@ function TicketRow({
     formState: { errors },
     reset,
   } = useForm<TicketTypeForm>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(ticketTypeSchema) as any,
     defaultValues: {
       nameAr: ticket.nameAr ?? "",
@@ -452,7 +451,6 @@ function AddTicketForm({
   const [saving, setSaving] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const { register, handleSubmit, setValue, formState: { errors } } = useForm<TicketTypeForm>({
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(ticketTypeSchema) as any,
     defaultValues: blankTicket(),
   });
@@ -721,7 +719,6 @@ function EventDetailPage() {
     formState: { errors, isDirty },
   } = useForm<UpdateEventForm>({
     defaultValues: formDefaults,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     resolver: zodResolver(updateEventSchema) as any,
     mode: "onBlur",
   });
