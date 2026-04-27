@@ -334,7 +334,7 @@ export const listOrganizersAdmin = createServerFn({ method: "GET" })
   .inputValidator(
     z.object({
       page: z.number().min(1).optional(),
-      limit: z.number().min(1).max(100).optional(),
+      limit: z.number().min(1).max(50).optional(),
     })
   )
   .handler(async ({ data }) => {

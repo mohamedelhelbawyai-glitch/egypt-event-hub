@@ -163,7 +163,7 @@ export const Route = createFileRoute("/admin/events/new")({
       listRefundPoliciesAdmin(),
       listTicketTemplatesAdmin(),
       listVenuesAdmin({ data: { page: 1, limit: 20 } }),
-      listOrganizersAdmin({ data: { page: 1, limit: 100 } }),
+      listOrganizersAdmin({ data: { page: 1, limit: 50 } }),
     ]);
 
     return {
